@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.env
+*.log
+chroma_data/
+chroma/
+logs/
+.claude/

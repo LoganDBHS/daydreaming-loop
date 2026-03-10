@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DDL Review Dashboard</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, -apple-system, sans-serif; background: #f5f5f5; color: #222; }
+    header { background: #1a1a2e; color: #fff; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; }
+    header h1 { font-size: 1.3rem; }
+    .stats { display: flex; gap: 16px; font-size: 0.85rem; }
+    .stats span { background: rgba(255,255,255,0.15); padding: 4px 10px; border-radius: 4px; }
+    .container { max-width: 1100px; margin: 24px auto; padding: 0 16px; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+    .tabs button { padding: 8px 16px; border: 1px solid #ccc; background: #fff; border-radius: 4px; cursor: pointer; font-size: 0.9rem; }
+    .tabs button.active { background: #1a1a2e; color: #fff; border-color: #1a1a2e; }
+    .card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 20px; margin-bottom: 16px; }
+    .card h3 { margin-bottom: 8px; font-size: 1.05rem; }
+    .card .meta { font-size: 0.8rem; color: #666; margin-bottom: 12px; }
+    .section { margin-bottom: 12px; }
+    .section-title { font-weight: 600; font-size: 0.85rem; color: #555; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .scores { display: flex; gap: 12px; flex-wrap: wrap; }
+    .score-badge { padding: 4px 10px; border-radius: 4px; font-size: 0.85rem; font-weight: 600; }
+    .score-good { background: #d4edda; color: #155724; }
+    .score-ok { background: #fff3cd; color: #856404; }
+    .score-bad { background: #f8d7da; color: #721c24; }
+    .provenance { font-size: 0.85rem; color: #444; background: #f9f9f9; padding: 10px; border-radius: 4px; }
+    .provenance p { margin-bottom: 4px; }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; padding-top: 12px; border-top: 1px solid #eee; }
+    .actions button { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: 600; }
+    .btn-approve { background: #28a745; color: #fff; }
+    .btn-reject { background: #dc3545; color: #fff; }
+    .btn-investigate { background: #ffc107; color: #333; }
+    .btn-refine { background: #17a2b8; color: #fff; }
+    .actions button:hover { opacity: 0.85; }
+    .decision-form { margin-top: 12px; padding: 12px; background: #f0f0f0; border-radius: 6px; display: none; }
+    .decision-form select, .decision-form textarea { width: 100%; padding: 6px; margin: 4px 0 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.9rem; }
+    .decision-form textarea { height: 60px; resize: vertical; }
+    .decision-form .submit-row { display: flex; gap: 8px; }
+    .decision-form .submit-row button { padding: 6px 14px; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.85rem; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
+    .badge-approved { background: #28a745; color: #fff; }
+    .badge-rejected { background: #dc3545; color: #fff; }
+    .badge-investigate { background: #ffc107; color: #333; }
+    .badge-refine { background: #17a2b8; color: #fff; }
+    .empty { text-align: center; color: #888; padding: 40px; }
+    details { margin-top: 8px; }
+    details summary { cursor: pointer; font-size: 0.85rem; color: #555; }
+    details[open] summary { margin-bottom: 6px; }
+    pre { background: #272822; color: #f8f8f2; padding: 10px; border-radius: 4px; overflow-x: auto; font-size: 0.8rem; margin-top: 4px; }
+    ul.attacks li, ul.predictions li, ul.works li { font-size: 0.85rem; margin-bottom: 4px; }
+
+    /* ── Concept input styles ── */
+    .input-panel { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 20px; margin-bottom: 16px; }
+    .input-panel h2 { font-size: 1.1rem; margin-bottom: 16px; }
+    .input-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+    .input-tabs button { padding: 6px 14px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; cursor: pointer; font-size: 0.85rem; }
+    .input-tabs button.active { background: #1a1a2e; color: #fff; border-color: #1a1a2e; }
+    .input-form { display: none; }
+    .input-form.active { display: block; }
+    .input-form label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; color: #444; }
+    .input-form input, .input-form textarea, .input-form select { width: 100%; padding: 8px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.9rem; font-family: inherit; }
+    .input-form textarea { height: 100px; resize: vertical; }
+    .input-form button[type="submit"] { padding: 10px 20px; background: #1a1a2e; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9rem; font-weight: 600; }
+    .input-form button[type="submit"]:hover { opacity: 0.85; }
+    .input-form button[type="submit"]:disabled { opacity: 0.5; cursor: not-allowed; }
+    .msg { padding: 8px 12px; border-radius: 4px; margin-bottom: 12px; font-size: 0.85rem; }
+    .msg-ok { background: #d4edda; color: #155724; }
+    .msg-err { background: #f8d7da; color: #721c24; }
+    .concept-list { margin-top: 16px; }
+    .concept-item { background: #f9f9f9; border: 1px solid #eee; border-radius: 6px; padding: 12px; margin-bottom: 8px; }
+    .concept-item .concept-text { font-size: 0.9rem; margin-bottom: 4px; }
+    .concept-item .concept-meta { font-size: 0.75rem; color: #888; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>DDL Review Dashboard</h1>
+    <div class="stats" id="stats"></div>
+  </header>
+  <div class="container">
+    <div class="tabs">
+      <button data-tab="concepts">Concepts</button>
+      <button class="active" data-tab="pending">Pending</button>
+      <button data-tab="reviewed">Reviewed</button>
+      <button data-tab="all">All</button>
+      <button data-tab="analytics">Analytics</button>
+    </div>
+
+    <!-- Concepts panel -->
+    <div id="concepts-panel" style="display:none">
+      <div class="input-panel">
+        <h2>Add New Concepts</h2>
+        <div id="input-msg"></div>
+        <div class="input-tabs">
+          <button class="active" data-input="text">Text</button>
+          <button data-input="url">URL</button>
+          <button data-input="document">Document</button>
+        </div>
+
+        <!-- Text input -->
+        <form class="input-form active" id="form-text" onsubmit="return submitText(event)">
+          <label>Concept Text</label>
+          <textarea id="concept-text" placeholder="Describe the concept — a paragraph or a few sentences..."></textarea>
+          <label>Source</label>
+          <input id="concept-source" type="text" placeholder="e.g. 'Shannon 1948', 'Manual entry', 'Neuroscience textbook'">
+          <label>Domain</label>
+          <input id="concept-domain" type="text" placeholder="e.g. 'information theory', 'neuroscience', 'economics'">
+          <button type="submit" id="btn-text">Add Concept</button>
+        </form>
+
+        <!-- URL input -->
+        <form class="input-form" id="form-url" onsubmit="return submitUrl(event)">
+          <label>URL</label>
+          <input id="concept-url" type="url" placeholder="https://...">
+          <label>Domain</label>
+          <input id="concept-url-domain" type="text" placeholder="e.g. 'machine learning', 'biology'">
+          <button type="submit" id="btn-url">Fetch & Add Concepts</button>
+        </form>
+
+        <!-- Document upload -->
+        <form class="input-form" id="form-document" onsubmit="return submitDocument(event)">
+          <label>Document File (.pdf, .txt, .md, .html, .csv, .json)</label>
+          <input id="concept-file" type="file" accept=".pdf,.txt,.md,.text,.html,.htm,.csv,.json">
+          <label>Domain</label>
+          <input id="concept-doc-domain" type="text" placeholder="e.g. 'machine learning', 'biology'">
+          <button type="submit" id="btn-doc">Upload & Chunk</button>
+        </form>
+      </div>
+
+      <div id="concept-count" style="font-size:0.9rem;color:#666;margin-bottom:8px"></div>
+      <div id="concept-list" class="concept-list"></div>
+    </div>
+
+    <!-- Analytics panel -->
+    <div id="analytics-panel" style="display:none">
+      <div class="card">
+        <h3 style="margin-bottom:16px">Pipeline Analytics</h3>
+        <div id="analytics-content"><div class="empty">Loading...</div></div>
+      </div>
+    </div>
+
+    <!-- Candidates list -->
+    <div id="list"></div>
+  </div>
+
+<script>
+const API = '';
+let currentTab = 'pending';
+
+// ── Helpers ──
+function scoreBadge(label, value, max = 10) {
+  const ratio = value / max;
+  const cls = ratio >= 0.6 ? 'score-good' : ratio >= 0.4 ? 'score-ok' : 'score-bad';
+  return `<span class="score-badge ${cls}">${label}: ${typeof value === 'number' ? value.toFixed(1) : value}</span>`;
+}
+
+function decisionBadge(d) {
+  return `<span class="badge badge-${d}">${d}</span>`;
+}
+
+function showMsg(text, ok) {
+  const el = document.getElementById('input-msg');
+  el.innerHTML = `<div class="msg ${ok ? 'msg-ok' : 'msg-err'}">${escHtml(text)}</div>`;
+  setTimeout(() => { el.innerHTML = ''; }, 5000);
+}
+
+// ── Render candidate ──
+function renderCandidate(c, decision) {
+  const ins = c.insight;
+  const pz = c.puzzle;
+  const ev = c.evaluation;
+  const [cA, cB] = c.sourceConcepts;
+
+  let html = `<div class="card" id="card-${ins.id}">`;
+
+  if (decision) {
+    html += `<div style="margin-bottom:8px">${decisionBadge(decision.decision)}`;
+    if (decision.rejectionReason) html += ` <span style="font-size:0.8rem;color:#666">(${decision.rejectionReason})</span>`;
+    html += `</div>`;
+  }
+
+  html += `<h3>${ins.insightStatement}</h3>`;
+  html += `<div class="meta">ID: ${ins.id} | Path: ${ev.path} | Created: ${new Date(ins.createdAt).toLocaleDateString()}</div>`;
+  html += `<div class="section"><div class="section-title">Mechanism</div><p style="font-size:0.9rem">${ins.mechanism}</p></div>`;
+  html += `<div class="section"><div class="section-title">Source Puzzle</div>`;
+  html += `<p style="font-size:0.9rem">${pz.puzzleStatement}</p>`;
+  html += `<p style="font-size:0.8rem;color:#666;margin-top:4px"><em>Why surprising:</em> ${pz.whyHardToExplain}</p></div>`;
+  html += `<div class="section"><div class="section-title">Source Concepts</div><div class="provenance">`;
+  html += `<p><strong>${cA.domain}:</strong> ${cA.text} <span style="font-size:0.75rem;color:#888">(${cA.source})</span></p>`;
+  html += `<p><strong>${cB.domain}:</strong> ${cB.text} <span style="font-size:0.75rem;color:#888">(${cB.source})</span></p>`;
+  html += `</div></div>`;
+
+  html += `<div class="section"><div class="section-title">Evaluation Scores</div><div class="scores">`;
+  html += scoreBadge('Composite', ev.compositeScore);
+  if (ev.fertility) html += scoreBadge('Fertility', ev.fertility.overallScore);
+  if (ev.adversarial) html += scoreBadge('Resilience', ev.adversarial.overallResilience);
+  if (ev.unification) html += scoreBadge('Unification', ev.unification.unificationScore, 1);
+  html += scoreBadge('Novel', ev.novelty.isNovel ? 'Yes' : 'No', 'Yes');
+  html += scoreBadge('Grounded', ev.grounding.isGrounded ? 'Yes' : 'No', 'Yes');
+  html += `</div></div>`;
+
+  if (ev.formalVerification) {
+    html += `<details><summary>Formal Verification (${ev.formalVerification.passed ? 'PASSED' : 'FAILED'})</summary>`;
+    html += `<pre>${escHtml(ev.formalVerification.testCode)}</pre>`;
+    html += `<p style="font-size:0.85rem;margin-top:4px">Output: ${escHtml(ev.formalVerification.output)}</p></details>`;
+  }
+
+  if (ev.fertility && ev.fertility.predictions.length > 0) {
+    html += `<details><summary>Predictions (${ev.fertility.predictions.length})</summary><ul class="predictions">`;
+    for (const p of ev.fertility.predictions) {
+      html += `<li>${escHtml(p.prediction)} <span style="color:#888">(specificity: ${p.specificity}, independence: ${p.independence}, checkability: ${p.checkability})</span></li>`;
+    }
+    html += `</ul></details>`;
+  }
+
+  if (ev.adversarial && ev.adversarial.attacks.length > 0) {
+    html += `<details><summary>Strongest Objections (${ev.adversarial.attacks.length})</summary><ul class="attacks">`;
+    for (const a of ev.adversarial.attacks) {
+      html += `<li><strong>[${a.vector}]</strong> severity ${a.severity}/10: ${escHtml(a.finding)}</li>`;
+    }
+    html += `</ul></details>`;
+  }
+
+  if (ev.unification && ev.unification.puzzlesResolved && ev.unification.puzzlesResolved.length > 0) {
+    const resolved = ev.unification.puzzlesResolved.filter(p => p.relevanceScore >= 6);
+    html += `<details><summary>Unification Map (${resolved.length} puzzles resolved)</summary><ul class="works">`;
+    for (const p of ev.unification.puzzlesResolved) {
+      const cls = p.relevanceScore >= 6 ? 'color:#155724' : 'color:#888';
+      html += `<li style="${cls}">Puzzle ${escHtml(p.puzzleId.slice(0,8))}... — relevance: ${p.relevanceScore}/10</li>`;
+    }
+    html += `</ul></details>`;
+  }
+
+  if (ev.grounding && ev.grounding.contradictions && ev.grounding.contradictions.length > 0) {
+    html += `<details><summary>Grounding Issues (${ev.grounding.contradictions.length} contradictions)</summary><ul class="attacks">`;
+    for (const c of ev.grounding.contradictions) {
+      html += `<li><strong>${escHtml(c.claim)}</strong> — contradicted by: ${escHtml(c.contradictedBy)} <span style="color:#888">(${escHtml(c.source)})</span></li>`;
+    }
+    html += `</ul></details>`;
+  }
+
+  if (ev.novelty.existingWorks.length > 0) {
+    html += `<details><summary>Closest Existing Work (${ev.novelty.existingWorks.length})</summary><ul class="works">`;
+    for (const w of ev.novelty.existingWorks) {
+      html += `<li><a href="${escHtml(w.url)}" target="_blank">${escHtml(w.title)}</a> — ${escHtml(w.similarityAssessment)}</li>`;
+    }
+    html += `</ul></details>`;
+  }
+
+  html += `<details><summary>Full Provenance Chain</summary><div class="provenance">`;
+  html += `<p><strong>Concepts:</strong> ${cA.id} + ${cB.id}</p>`;
+  html += `<p><strong>Puzzle:</strong> ${pz.id} (U-score: ${pz.stScore.unexpectedness.toFixed(2)})</p>`;
+  if (ins.enrichmentConceptIds.length > 0) html += `<p><strong>Enrichment:</strong> ${ins.enrichmentConceptIds.join(', ')}</p>`;
+  html += `<p><strong>Insight:</strong> ${ins.id}</p>`;
+  html += `<p><strong>How it resolves puzzle:</strong> ${escHtml(ins.howItResolvesPuzzle)}</p>`;
+  html += `</div></details>`;
+
+  if (decision && decision.expertNotes) {
+    html += `<div class="section" style="margin-top:8px"><div class="section-title">Expert Notes</div><p style="font-size:0.9rem">${escHtml(decision.expertNotes)}</p></div>`;
+  }
+
+  if (!decision) {
+    html += `<div class="actions">`;
+    html += `<button class="btn-approve" onclick="decide('${ins.id}','approved')">Approve</button>`;
+    html += `<button class="btn-reject" onclick="showRejectForm('${ins.id}')">Reject</button>`;
+    html += `<button class="btn-investigate" onclick="decide('${ins.id}','investigate')">Investigate</button>`;
+    html += `<button class="btn-refine" onclick="decide('${ins.id}','refine')">Refine</button>`;
+    html += `</div>`;
+    html += `<div class="decision-form" id="form-${ins.id}">`;
+    html += `<label style="font-size:0.85rem;font-weight:600">Rejection Reason</label>`;
+    html += `<select id="reason-${ins.id}">`;
+    html += `<option value="trivially_obvious">Trivially obvious</option>`;
+    html += `<option value="already_known">Already known</option>`;
+    html += `<option value="factually_wrong">Factually wrong</option>`;
+    html += `<option value="not_actionable">Not actionable</option>`;
+    html += `<option value="too_vague">Too vague</option>`;
+    html += `<option value="rhetorical_mimicry">Rhetorical mimicry</option>`;
+    html += `</select>`;
+    html += `<label style="font-size:0.85rem;font-weight:600">Notes (optional)</label>`;
+    html += `<textarea id="notes-${ins.id}" placeholder="Add notes..."></textarea>`;
+    html += `<div class="submit-row">`;
+    html += `<button style="background:#dc3545;color:#fff" onclick="submitReject('${ins.id}')">Confirm Reject</button>`;
+    html += `<button style="background:#999;color:#fff" onclick="hideForm('${ins.id}')">Cancel</button>`;
+    html += `</div></div>`;
+  }
+
+  html += `</div>`;
+  return html;
+}
+
+function escHtml(s) {
+  if (!s) return '';
+  const div = document.createElement('div');
+  div.textContent = String(s);
+  return div.innerHTML;
+}
+
+// ── API: Stats & Candidates ──
+async function loadStats() {
+  try {
+    const res = await fetch(`${API}/api/stats`);
+    const s = await res.json();
+    const countRes = await fetch(`${API}/api/concepts/count`);
+    const c = await countRes.json();
+    document.getElementById('stats').innerHTML =
+      `<span>Concepts: ${c.count}</span>` +
+      `<span>Total: ${s.totalCandidates}</span>` +
+      `<span>Pending: ${s.pending}</span>` +
+      `<span>Approved: ${s.approved}</span>` +
+      `<span>Rejected: ${s.rejected}</span>`;
+  } catch {
+    document.getElementById('stats').innerHTML = '<span>Stats unavailable</span>';
+  }
+}
+
+async function loadCandidates() {
+  const filter = currentTab === 'all' ? '' : currentTab;
+  if (filter === 'concepts') return;
+  const url = filter ? `${API}/api/candidates?filter=${filter}` : `${API}/api/candidates`;
+  const res = await fetch(url);
+  const data = await res.json();
+  const list = document.getElementById('list');
+
+  if (data.length === 0) {
+    list.innerHTML = '<div class="empty">No candidates to show.</div>';
+    return;
+  }
+
+  let html = '';
+  for (const item of data) {
+    if (item.candidate) {
+      html += renderCandidate(item.candidate, item.decision);
+    } else {
+      html += renderCandidate(item, null);
+    }
+  }
+  list.innerHTML = html;
+}
+
+async function decide(candidateId, decision, rejectionReason, notes) {
+  const body = { candidateId, decision };
+  if (rejectionReason) body.rejectionReason = rejectionReason;
+  if (notes) body.expertNotes = notes;
+
+  try {
+    const res = await fetch(`${API}/api/decisions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      console.error('Decision failed:', err);
+      return;
+    }
+  } catch (e) {
+    console.error('Decision request failed:', e);
+    return;
+  }
+  await loadStats();
+  await loadCandidates();
+}
+
+function showRejectForm(id) {
+  document.getElementById(`form-${id}`).style.display = 'block';
+}
+
+function hideForm(id) {
+  document.getElementById(`form-${id}`).style.display = 'none';
+}
+
+function submitReject(id) {
+  const reason = document.getElementById(`reason-${id}`).value;
+  const notes = document.getElementById(`notes-${id}`).value;
+  decide(id, 'rejected', reason, notes || undefined);
+}
+
+// ── API: Concepts ──
+async function loadConcepts() {
+  try {
+    const res = await fetch(`${API}/api/concepts`);
+    const concepts = await res.json();
+    const list = document.getElementById('concept-list');
+    const count = document.getElementById('concept-count');
+    count.textContent = `${concepts.length} concept${concepts.length !== 1 ? 's' : ''} in database`;
+
+    if (concepts.length === 0) {
+      list.innerHTML = '<div class="empty">No concepts yet. Add some above to get started.</div>';
+      return;
+    }
+
+    let html = '';
+    for (const c of concepts) {
+      html += `<div class="concept-item">`;
+      html += `<div class="concept-text">${escHtml(c.text)}</div>`;
+      html += `<div class="concept-meta"><strong>${escHtml(c.domain)}</strong> | Source: ${escHtml(c.source)} | ${c.id.slice(0,8)}... <button onclick="removeConcept('${c.id}')" style="margin-left:8px;padding:2px 8px;background:#dc3545;color:#fff;border:none;border-radius:3px;cursor:pointer;font-size:0.75rem;">Delete</button></div>`;
+      html += `</div>`;
+    }
+    list.innerHTML = html;
+  } catch (err) {
+    document.getElementById('concept-list').innerHTML = '<div class="empty">Could not load concepts. Is ChromaDB running?</div>';
+  }
+}
+
+async function submitText(e) {
+  e.preventDefault();
+  const text = document.getElementById('concept-text').value.trim();
+  const source = document.getElementById('concept-source').value.trim();
+  const domain = document.getElementById('concept-domain').value.trim();
+  if (!text || !source || !domain) { showMsg('All fields are required.', false); return false; }
+
+  const btn = document.getElementById('btn-text');
+  btn.disabled = true;
+  btn.textContent = 'Adding...';
+
+  try {
+    const res = await fetch(`${API}/api/concepts/text`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, source, domain }),
+    });
+    const data = await res.json();
+    if (!res.ok) { showMsg(data.error || 'Failed to add concept', false); return false; }
+    showMsg(`Concept added (${data.concept.id.slice(0,8)}...)`, true);
+    document.getElementById('concept-text').value = '';
+    document.getElementById('concept-source').value = '';
+    await loadConcepts();
+    await loadStats();
+  } catch (err) {
+    showMsg('Request failed — is the server running?', false);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Add Concept';
+  }
+  return false;
+}
+
+async function submitUrl(e) {
+  e.preventDefault();
+  const url = document.getElementById('concept-url').value.trim();
+  const domain = document.getElementById('concept-url-domain').value.trim();
+  if (!url || !domain) { showMsg('URL and domain are required.', false); return false; }
+
+  const btn = document.getElementById('btn-url');
+  btn.disabled = true;
+  btn.textContent = 'Fetching...';
+
+  try {
+    const res = await fetch(`${API}/api/concepts/url`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url, domain }),
+    });
+    const data = await res.json();
+    if (!res.ok) { showMsg(data.error || 'Failed to fetch URL', false); return false; }
+    showMsg(`Added ${data.count} concept${data.count !== 1 ? 's' : ''} from URL`, true);
+    document.getElementById('concept-url').value = '';
+    await loadConcepts();
+    await loadStats();
+  } catch (err) {
+    showMsg('Request failed — is the server running?', false);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Fetch & Add Concepts';
+  }
+  return false;
+}
+
+async function submitDocument(e) {
+  e.preventDefault();
+  const fileInput = document.getElementById('concept-file');
+  const domain = document.getElementById('concept-doc-domain').value.trim();
+  if (!fileInput.files.length || !domain) { showMsg('File and domain are required.', false); return false; }
+
+  const file = fileInput.files[0];
+  const btn = document.getElementById('btn-doc');
+  btn.disabled = true;
+  btn.textContent = 'Uploading...';
+
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('domain', domain);
+
+    const res = await fetch(`${API}/api/concepts/document`, {
+      method: 'POST',
+      body: formData,
+    });
+    const data = await res.json();
+    if (!res.ok) { showMsg(data.error || 'Failed to upload', false); return false; }
+    showMsg(`Added ${data.count} concept${data.count !== 1 ? 's' : ''} from ${file.name}`, true);
+    fileInput.value = '';
+    await loadConcepts();
+    await loadStats();
+  } catch (err) {
+    showMsg('Upload failed: ' + (err.message || err), false);
+    console.error('Document upload error:', err);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Upload & Chunk';
+  }
+  return false;
+}
+
+async function removeConcept(id) {
+  if (!confirm('Delete this concept?')) return;
+  try {
+    const res = await fetch(`${API}/api/concepts/${id}`, { method: 'DELETE' });
+    if (!res.ok) { const d = await res.json(); showMsg(d.error || 'Delete failed', false); return; }
+    showMsg('Concept deleted', true);
+    await loadConcepts();
+    await loadStats();
+  } catch (err) {
+    showMsg('Delete request failed', false);
+  }
+}
+
+// ── Analytics ──
+async function loadAnalytics() {
+  try {
+    const res = await fetch(`${API}/api/analytics/rejections`);
+    const data = await res.json();
+    const el = document.getElementById('analytics-content');
+
+    let html = `<div class="scores" style="margin-bottom:16px">`;
+    html += `<span class="score-badge score-good">Approval Rate: ${data.approvalRate}</span>`;
+    html += `<span class="score-badge score-ok">Total Decisions: ${data.totalDecisions}</span>`;
+    html += `<span class="score-badge score-bad">Total Rejections: ${data.totalRejections}</span>`;
+    html += `</div>`;
+
+    const reasons = data.rejectionsByReason;
+    const reasonKeys = Object.keys(reasons);
+    if (reasonKeys.length > 0) {
+      html += `<div class="section"><div class="section-title">Rejection Reasons</div>`;
+      html += `<div style="margin-top:8px">`;
+      for (const [reason, count] of Object.entries(reasons).sort((a,b) => b[1] - a[1])) {
+        const pct = data.totalRejections > 0 ? ((count / data.totalRejections) * 100).toFixed(0) : 0;
+        html += `<div style="display:flex;align-items:center;margin-bottom:6px">`;
+        html += `<span style="width:180px;font-size:0.85rem">${reason.replace(/_/g,' ')}</span>`;
+        html += `<div style="flex:1;background:#eee;border-radius:3px;height:20px;margin:0 8px">`;
+        html += `<div style="width:${pct}%;background:#dc3545;height:100%;border-radius:3px;min-width:2px"></div>`;
+        html += `</div>`;
+        html += `<span style="font-size:0.85rem;font-weight:600;width:60px;text-align:right">${count} (${pct}%)</span>`;
+        html += `</div>`;
+      }
+      html += `</div></div>`;
+    } else {
+      html += `<div class="empty">No rejections yet. Review some candidates to see analytics.</div>`;
+    }
+
+    el.innerHTML = html;
+  } catch {
+    document.getElementById('analytics-content').innerHTML = '<div class="empty">Could not load analytics.</div>';
+  }
+}
+
+// ── Tabs ──
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.tabs button[data-tab="${tab}"]`).classList.add('active');
+
+  const conceptsPanel = document.getElementById('concepts-panel');
+  const analyticsPanel = document.getElementById('analytics-panel');
+  const listPanel = document.getElementById('list');
+
+  conceptsPanel.style.display = 'none';
+  analyticsPanel.style.display = 'none';
+  listPanel.style.display = 'none';
+
+  if (tab === 'concepts') {
+    conceptsPanel.style.display = 'block';
+    loadConcepts();
+  } else if (tab === 'analytics') {
+    analyticsPanel.style.display = 'block';
+    loadAnalytics();
+  } else {
+    listPanel.style.display = 'block';
+    loadCandidates();
+  }
+}
+
+document.querySelectorAll('.tabs button').forEach(btn => {
+  btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+});
+
+// Input sub-tabs (text / url)
+document.querySelectorAll('.input-tabs button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.input-tabs button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.input-form').forEach(f => f.classList.remove('active'));
+    document.getElementById('form-' + btn.dataset.input).classList.add('active');
+  });
+});
+
+// ── Init ──
+loadStats();
+loadCandidates();
+</script>
+</body>
+</html>
