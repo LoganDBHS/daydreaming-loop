@@ -37,8 +37,7 @@ import {
 function loadConfig(): DDLConfig {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
-    console.error('ANTHROPIC_API_KEY is required. Copy .env.template to .env and fill it in.');
-    process.exit(1);
+    throw new Error('ANTHROPIC_API_KEY is required. Copy .env.template to .env and fill it in.');
   }
 
   return {
@@ -95,44 +94,50 @@ async function buildReviewCandidate(
 
 // ── Adapters for runBatch dependency injection ──
 
-const collectedInsights: Insight[] = [];
-
 async function getRelatedByText(text: string, k: number): Promise<Concept[]> {
   const results = await queryByText(text, k);
   return results.map((r) => r.concept);
 }
 
-async function collectInsight(insight: Insight): Promise<void> {
-  collectedInsights.push(insight);
-}
+// ── Pipeline runner (called on-demand from dashboard) ──
 
-// ── Main ──
-
-async function main() {
+async function executePipeline(
+  onStatus: (msg: string) => void,
+  overrides?: { batchSize?: number },
+): Promise<{
+  pairsProcessed: number;
+  puzzlesValidated: number;
+  insightsGenerated: number;
+  candidatesAdded: number;
+}> {
   const config = loadConfig();
 
+  // Apply overrides from the UI
+  if (overrides?.batchSize && overrides.batchSize > 0) {
+    config.batchSize = overrides.batchSize;
+  }
+
   const conceptCount = await getConceptCount();
-  console.log(`Loaded ${conceptCount} concepts from vector store.`);
+  onStatus(`Loaded ${conceptCount} concepts from vector store.`);
 
   if (conceptCount < 2) {
-    console.log('Not enough concepts to run pipeline. Add concepts via the dashboard or data layer.');
-    console.log('Starting dashboard server...');
-    createServer(parseInt(process.env.DDL_PORT || '3000'));
-    return;
+    throw new Error('Not enough concepts to run pipeline. Add at least 2 concepts first.');
   }
 
   // 1. Run batch pipeline: pairs → puzzles → insights
-  console.log(`Running batch pipeline (batchSize=${config.batchSize})...`);
+  onStatus(`Running batch pipeline (batchSize=${config.batchSize})...`);
+
+  const collectedInsights: Insight[] = [];
 
   const batch = await runBatch(
     () => getRandomAntiCorrelatedPair(config.antiCorrelationWindow),
     getRelatedByText,
     dbStorePuzzle,
-    collectInsight,
+    async (insight: Insight) => { collectedInsights.push(insight); },
     config,
   );
 
-  console.log(
+  onStatus(
     `Batch done: ${batch.stats.pairsProcessed} pairs, ` +
     `${batch.stats.puzzlesValidated} validated puzzles, ` +
     `${batch.stats.insightsGenerated} insights`,
@@ -152,18 +157,17 @@ async function main() {
     ...storedPuzzles.filter((sp) => !batch.puzzles.some((bp) => bp.id === sp.id)),
   ];
 
-  console.log(`Evaluating ${collectedInsights.length} insights against ${allPuzzles.length} puzzles...`);
+  onStatus(`Evaluating ${collectedInsights.length} insights against ${allPuzzles.length} puzzles...`);
 
   let added = 0;
   for (const insight of collectedInsights) {
     const puzzle = batch.puzzles.find((p) => p.id === insight.puzzleId);
     if (!puzzle) continue;
 
-    console.log(`  Evaluating insight ${insight.id.slice(0, 8)}...`);
+    onStatus(`Evaluating insight ${insight.id.slice(0, 8)}...`);
 
     const evaluation = await evaluateInsight(insight, puzzle, allPuzzles, config, (log) => {
       logGeneric(log.event, log.data);
-      console.log(`    ${log.event}: ${JSON.stringify(log.data)}`);
     });
 
     logGeneric('insight_evaluated', {
@@ -186,11 +190,21 @@ async function main() {
     added++;
   }
 
-  console.log(`${added} candidates ready for expert review.`);
+  onStatus(`${added} candidates ready for expert review.`);
 
-  // 3. Start dashboard
+  return {
+    pairsProcessed: batch.stats.pairsProcessed,
+    puzzlesValidated: batch.stats.puzzlesValidated,
+    insightsGenerated: batch.stats.insightsGenerated,
+    candidatesAdded: added,
+  };
+}
+
+// ── Main ──
+
+async function main() {
   const port = parseInt(process.env.DDL_PORT || '3000');
-  createServer(port);
+  createServer(port, { runPipeline: executePipeline });
 }
 
 main().catch((err) => {

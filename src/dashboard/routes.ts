@@ -21,6 +21,82 @@ const upload = multer({
 
 const router = Router();
 
+// ── Pipeline runner (injected from main.ts) ──
+
+export type PipelineRunner = (
+  onStatus: (msg: string) => void,
+  overrides?: { batchSize?: number },
+) => Promise<{
+  pairsProcessed: number;
+  puzzlesValidated: number;
+  insightsGenerated: number;
+  candidatesAdded: number;
+}>;
+
+let pipelineRunner: PipelineRunner | null = null;
+let pipelineStatus: {
+  running: boolean;
+  messages: string[];
+  result: any | null;
+  error: string | null;
+  startedAt: string | null;
+  finishedAt: string | null;
+} = { running: false, messages: [], result: null, error: null, startedAt: null, finishedAt: null };
+
+export function setPipelineRunner(runner: PipelineRunner) {
+  pipelineRunner = runner;
+}
+
+router.post('/api/pipeline/run', (req: Request, res: Response) => {
+  if (!pipelineRunner) {
+    res.status(500).json({ error: 'Pipeline runner not configured' });
+    return;
+  }
+  if (pipelineStatus.running) {
+    res.status(409).json({ error: 'Pipeline is already running' });
+    return;
+  }
+
+  const batchSize = req.body?.batchSize ? parseInt(req.body.batchSize) : undefined;
+
+  pipelineStatus = {
+    running: true,
+    messages: [],
+    result: null,
+    error: null,
+    startedAt: new Date().toISOString(),
+    finishedAt: null,
+  };
+
+  res.json({ ok: true, message: 'Pipeline started' });
+
+  // Run in background — response already sent
+  const runner = pipelineRunner;
+  Promise.resolve().then(() =>
+    runner(
+      (msg: string) => {
+        pipelineStatus.messages.push(msg);
+        console.log(`[pipeline] ${msg}`);
+      },
+      batchSize ? { batchSize } : undefined,
+    )
+  ).then((result) => {
+    pipelineStatus.running = false;
+    pipelineStatus.result = result;
+    pipelineStatus.finishedAt = new Date().toISOString();
+    console.log('[pipeline] Finished:', result);
+  }).catch((err) => {
+    pipelineStatus.running = false;
+    pipelineStatus.error = err.message || String(err);
+    pipelineStatus.finishedAt = new Date().toISOString();
+    console.error('[pipeline] Error:', err);
+  });
+});
+
+router.get('/api/pipeline/status', (_req: Request, res: Response) => {
+  res.json(pipelineStatus);
+});
+
 // ── Candidates ──
 
 router.get('/api/candidates', (_req: Request, res: Response) => {

@@ -77,8 +77,22 @@
 <body>
   <header>
     <h1>DDL Review Dashboard</h1>
-    <div class="stats" id="stats"></div>
+    <div style="display:flex;align-items:center;gap:16px">
+      <div style="display:flex;align-items:center;gap:6px">
+        <label for="batch-size" style="font-size:0.8rem;opacity:0.8;white-space:nowrap">Batch:</label>
+        <input id="batch-size" type="number" min="1" max="50" value="5" style="width:52px;padding:5px 6px;border:none;border-radius:4px;font-size:0.85rem;text-align:center">
+        <button id="btn-run-pipeline" onclick="startPipeline()" style="padding:8px 18px;background:#28a745;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:0.9rem;font-weight:600;white-space:nowrap">Run Pipeline</button>
+      </div>
+      <div class="stats" id="stats"></div>
+    </div>
   </header>
+  <div id="pipeline-status" style="display:none;background:#eef;border-bottom:1px solid #ccd;padding:10px 24px;font-size:0.85rem">
+    <div style="display:flex;align-items:center;gap:12px">
+      <span id="pipeline-indicator" style="font-weight:600"></span>
+      <span id="pipeline-msg" style="color:#444"></span>
+    </div>
+    <div id="pipeline-result" style="margin-top:6px;display:none"></div>
+  </div>
   <div class="container">
     <div class="tabs">
       <button data-tab="concepts">Concepts</button>
@@ -596,9 +610,123 @@ document.querySelectorAll('.input-tabs button').forEach(btn => {
   });
 });
 
+// ── Pipeline ──
+let pipelinePolling = null;
+
+async function startPipeline() {
+  const btn = document.getElementById('btn-run-pipeline');
+  const batchSize = parseInt(document.getElementById('batch-size').value) || 5;
+  btn.disabled = true;
+  btn.textContent = 'Starting...';
+  btn.style.opacity = '0.6';
+  btn.style.cursor = 'not-allowed';
+
+  try {
+    const res = await fetch(`${API}/api/pipeline/run`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ batchSize }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      alert(data.error || 'Failed to start pipeline');
+      btn.disabled = false;
+      btn.textContent = 'Run Pipeline';
+      btn.style.opacity = '1';
+      btn.style.cursor = 'pointer';
+      return;
+    }
+    // Start polling for status
+    showPipelineStatus();
+    pipelinePolling = setInterval(pollPipelineStatus, 1500);
+  } catch (err) {
+    alert('Could not start pipeline: ' + (err.message || err));
+    btn.disabled = false;
+    btn.textContent = 'Run Pipeline';
+    btn.style.opacity = '1';
+    btn.style.cursor = 'pointer';
+  }
+}
+
+function showPipelineStatus() {
+  const panel = document.getElementById('pipeline-status');
+  panel.style.display = 'block';
+  document.getElementById('pipeline-indicator').textContent = 'Running...';
+  document.getElementById('pipeline-indicator').style.color = '#856404';
+  document.getElementById('pipeline-msg').textContent = 'Pipeline started';
+  document.getElementById('pipeline-result').style.display = 'none';
+}
+
+async function pollPipelineStatus() {
+  try {
+    const res = await fetch(`${API}/api/pipeline/status`);
+    const s = await res.json();
+    const indicator = document.getElementById('pipeline-indicator');
+    const msg = document.getElementById('pipeline-msg');
+    const resultEl = document.getElementById('pipeline-result');
+
+    // Show latest message
+    if (s.messages.length > 0) {
+      msg.textContent = s.messages[s.messages.length - 1];
+    }
+
+    if (!s.running) {
+      clearInterval(pipelinePolling);
+      pipelinePolling = null;
+
+      const btn = document.getElementById('btn-run-pipeline');
+      btn.disabled = false;
+      btn.textContent = 'Run Pipeline';
+      btn.style.opacity = '1';
+      btn.style.cursor = 'pointer';
+
+      if (s.error) {
+        indicator.textContent = 'Failed';
+        indicator.style.color = '#dc3545';
+        msg.textContent = s.error;
+      } else if (s.result) {
+        indicator.textContent = 'Complete';
+        indicator.style.color = '#28a745';
+        resultEl.style.display = 'block';
+        resultEl.innerHTML =
+          `<span class="score-badge score-good">Pairs: ${s.result.pairsProcessed}</span> ` +
+          `<span class="score-badge score-ok">Validated Puzzles: ${s.result.puzzlesValidated}</span> ` +
+          `<span class="score-badge score-ok">Insights: ${s.result.insightsGenerated}</span> ` +
+          `<span class="score-badge score-good">Candidates Added: ${s.result.candidatesAdded}</span>`;
+      }
+
+      // Refresh data
+      await loadStats();
+      if (currentTab !== 'concepts' && currentTab !== 'analytics') {
+        await loadCandidates();
+      }
+    }
+  } catch {
+    // Ignore polling errors
+  }
+}
+
+// Check if pipeline is already running on page load
+async function checkPipelineOnLoad() {
+  try {
+    const res = await fetch(`${API}/api/pipeline/status`);
+    const s = await res.json();
+    if (s.running) {
+      const btn = document.getElementById('btn-run-pipeline');
+      btn.disabled = true;
+      btn.textContent = 'Running...';
+      btn.style.opacity = '0.6';
+      btn.style.cursor = 'not-allowed';
+      showPipelineStatus();
+      pipelinePolling = setInterval(pollPipelineStatus, 1500);
+    }
+  } catch { /* ignore */ }
+}
+
 // ── Init ──
 loadStats();
 loadCandidates();
+checkPipelineOnLoad();
 </script>
 </body>
 </html>
