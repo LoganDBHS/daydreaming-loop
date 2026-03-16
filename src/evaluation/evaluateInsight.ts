@@ -49,8 +49,10 @@ export async function evaluateInsight(
 
       if (verification.passed) {
         // Formally verified — high confidence, skip soft eval
-        const novelty = await runNoveltySearch(insight.insightStatement, config);
-        const grounding = await runGroundingCheck(insight.insightStatement, insight.mechanism, config);
+        const [novelty, grounding] = await Promise.all([
+          runNoveltySearch(insight.insightStatement, config),
+          runGroundingCheck(insight.insightStatement, insight.mechanism, config),
+        ]);
 
         return {
           insightId: insight.id,
@@ -65,8 +67,10 @@ export async function evaluateInsight(
 
       if (!verification.passed && !verification.output.includes('INCONCLUSIVE')) {
         // Formally falsified — discard
-        const novelty = await runNoveltySearch(insight.insightStatement, config);
-        const grounding = await runGroundingCheck(insight.insightStatement, insight.mechanism, config);
+        const [novelty, grounding] = await Promise.all([
+          runNoveltySearch(insight.insightStatement, config),
+          runGroundingCheck(insight.insightStatement, insight.mechanism, config),
+        ]);
 
         return {
           insightId: insight.id,
@@ -95,8 +99,10 @@ export async function evaluateInsight(
   if (fertility.overallScore < config.fertilityThreshold) {
     log('fertility_below_threshold', { score: fertility.overallScore, threshold: config.fertilityThreshold });
     // Early termination — still run novelty/grounding for logging
-    const novelty = await runNoveltySearch(insight.insightStatement, config);
-    const grounding = await runGroundingCheck(insight.insightStatement, insight.mechanism, config);
+    const [novelty, grounding] = await Promise.all([
+      runNoveltySearch(insight.insightStatement, config),
+      runGroundingCheck(insight.insightStatement, insight.mechanism, config),
+    ]);
 
     return {
       insightId: insight.id,
@@ -115,8 +121,10 @@ export async function evaluateInsight(
 
   if (adversarial.overallResilience < config.resilienceThreshold) {
     log('resilience_below_threshold', { score: adversarial.overallResilience, threshold: config.resilienceThreshold });
-    const novelty = await runNoveltySearch(insight.insightStatement, config);
-    const grounding = await runGroundingCheck(insight.insightStatement, insight.mechanism, config);
+    const [novelty, grounding] = await Promise.all([
+      runNoveltySearch(insight.insightStatement, config),
+      runGroundingCheck(insight.insightStatement, insight.mechanism, config),
+    ]);
 
     return {
       insightId: insight.id,
@@ -135,8 +143,13 @@ export async function evaluateInsight(
     };
   }
 
-  // 3c: Unification
-  const unification = await runUnificationCheck(insight, allPuzzles, config);
+  // 3c: Unification, novelty, and grounding can run in parallel
+  const [unification, novelty, grounding] = await Promise.all([
+    runUnificationCheck(insight, allPuzzles, config),
+    runNoveltySearch(insight.insightStatement, config),
+    runGroundingCheck(insight.insightStatement, insight.mechanism, config),
+  ]);
+
   log('unification_checked', {
     score: unification.unificationScore,
     puzzlesResolved: unification.puzzlesResolved.filter((p) => p.relevanceScore >= 6).length,
@@ -145,10 +158,6 @@ export async function evaluateInsight(
   // 3d: Composite
   const compositeScore = calculateCompositeScore(fertility, adversarial, unification, config);
   log('composite_calculated', { compositeScore, threshold: config.compositeThreshold });
-
-  // Step 4: Novelty & grounding (both paths)
-  const novelty = await runNoveltySearch(insight.insightStatement, config);
-  const grounding = await runGroundingCheck(insight.insightStatement, insight.mechanism, config);
 
   return {
     insightId: insight.id,

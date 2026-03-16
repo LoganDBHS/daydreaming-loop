@@ -32,12 +32,14 @@ import {
   EvaluationResult,
 } from './src/shared/types.js';
 
+import { parallelMap, getConcurrency } from './src/shared/concurrency.js';
+
 // ── Load config ──
 
 function loadConfig(): DDLConfig {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_AUTH_TOKEN;
   if (!apiKey) {
-    throw new Error('ANTHROPIC_API_KEY is required. Copy .env.template to .env and fill it in.');
+    throw new Error('ANTHROPIC_API_KEY or ANTHROPIC_AUTH_TOKEN is required. Copy .env.template to .env and fill it in.');
   }
 
   return {
@@ -102,7 +104,7 @@ async function getRelatedByText(text: string, k: number): Promise<Concept[]> {
 // ── Pipeline runner (called on-demand from dashboard) ──
 
 async function executePipeline(
-  onStatus: (msg: string) => void,
+  onStatus: (msg: string, progress?: { current: number; total: number; phase: string }) => void,
   overrides?: { batchSize?: number },
 ): Promise<{
   pairsProcessed: number;
@@ -125,7 +127,7 @@ async function executePipeline(
   }
 
   // 1. Run batch pipeline: pairs → puzzles → insights
-  onStatus(`Running batch pipeline (batchSize=${config.batchSize})...`);
+  onStatus(`Running batch pipeline (batchSize=${config.batchSize})...`, { current: 0, total: config.batchSize, phase: 'Generating puzzles' });
 
   const collectedInsights: Insight[] = [];
 
@@ -135,6 +137,10 @@ async function executePipeline(
     dbStorePuzzle,
     async (insight: Insight) => { collectedInsights.push(insight); },
     config,
+    (current, total, phase) => {
+      console.log(`[progress] ${phase}: ${current}/${total}`);
+      onStatus(`${phase}: ${current}/${total}`, { current, total, phase });
+    },
   );
 
   onStatus(
@@ -157,38 +163,53 @@ async function executePipeline(
     ...storedPuzzles.filter((sp) => !batch.puzzles.some((bp) => bp.id === sp.id)),
   ];
 
-  onStatus(`Evaluating ${collectedInsights.length} insights against ${allPuzzles.length} puzzles...`);
+  const evalConcurrency = getConcurrency(collectedInsights.length);
+  onStatus(`Evaluating ${collectedInsights.length} insights in parallel (concurrency=${evalConcurrency})...`, { current: 0, total: collectedInsights.length, phase: 'Evaluating insights' });
+
+  // Pair each insight with its puzzle
+  const insightsWithPuzzles = collectedInsights
+    .map((insight) => ({
+      insight,
+      puzzle: batch.puzzles.find((p) => p.id === insight.puzzleId),
+    }))
+    .filter((x): x is { insight: Insight; puzzle: Puzzle } => x.puzzle != null);
 
   let added = 0;
-  for (const insight of collectedInsights) {
-    const puzzle = batch.puzzles.find((p) => p.id === insight.puzzleId);
-    if (!puzzle) continue;
+  let evalsCompleted = 0;
+  const evalTotal = insightsWithPuzzles.length;
 
-    onStatus(`Evaluating insight ${insight.id.slice(0, 8)}...`);
+  await parallelMap(
+    insightsWithPuzzles,
+    async ({ insight, puzzle }) => {
+      onStatus(`Evaluating insight ${insight.id.slice(0, 8)}...`, { current: evalsCompleted, total: evalTotal, phase: 'Evaluating insights' });
 
-    const evaluation = await evaluateInsight(insight, puzzle, allPuzzles, config, (log) => {
-      logGeneric(log.event, log.data);
-    });
-
-    logGeneric('insight_evaluated', {
-      insightId: insight.id,
-      compositeScore: evaluation.compositeScore,
-      passed: evaluation.passesThreshold,
-    });
-
-    if (!evaluation.passesThreshold) {
-      logInsightDiscarded(insight.id, evaluation.compositeScore, 'composite_below_threshold', {
-        fertility: evaluation.fertility?.overallScore ?? 0,
-        resilience: evaluation.adversarial?.overallResilience ?? 0,
-        unification: evaluation.unification?.unificationScore ?? 0,
+      const evaluation = await evaluateInsight(insight, puzzle, allPuzzles, config, (log) => {
+        logGeneric(log.event, log.data);
       });
-      continue;
-    }
 
-    const candidate = await buildReviewCandidate(insight, puzzle, evaluation);
-    addCandidate(candidate);
-    added++;
-  }
+      evalsCompleted++;
+      logGeneric('insight_evaluated', {
+        insightId: insight.id,
+        compositeScore: evaluation.compositeScore,
+        passed: evaluation.passesThreshold,
+      });
+      onStatus(`Evaluated insight ${insight.id.slice(0, 8)} (score=${evaluation.compositeScore.toFixed(2)})`, { current: evalsCompleted, total: evalTotal, phase: 'Evaluating insights' });
+
+      if (!evaluation.passesThreshold) {
+        logInsightDiscarded(insight.id, evaluation.compositeScore, 'composite_below_threshold', {
+          fertility: evaluation.fertility?.overallScore ?? 0,
+          resilience: evaluation.adversarial?.overallResilience ?? 0,
+          unification: evaluation.unification?.unificationScore ?? 0,
+        });
+        return;
+      }
+
+      const candidate = await buildReviewCandidate(insight, puzzle, evaluation);
+      addCandidate(candidate);
+      added++;
+    },
+    evalConcurrency,
+  );
 
   onStatus(`${added} candidates ready for expert review.`);
 

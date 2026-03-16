@@ -1,11 +1,12 @@
 // src/pipeline/stScorer.ts — Simplicity Theory scoring
 
-import Anthropic from '@anthropic-ai/sdk';
 // @ts-ignore — zstd-codec has no type declarations
 import { ZstdCodec } from 'zstd-codec';
+import { gzipSync, deflateSync } from 'zlib';
 import { ST_SCORING_SYSTEM_PROMPT, stScoringUserPrompt } from './prompts';
+import { claudeClient } from '../shared/claudeClient';
 
-const client = new Anthropic();
+const client = claudeClient;
 
 interface STScore {
   C: number;   // description complexity (compression ratio, 0-1)
@@ -14,7 +15,7 @@ interface STScore {
 }
 
 /** Compress text with zstd and return ratio (compressed / original). Lower = more compressible = simpler. */
-async function compressionRatio(text: string): Promise<number> {
+async function zstdCompressionRatio(text: string): Promise<number> {
   return new Promise((resolve, reject) => {
     ZstdCodec.run((zstd: any) => {
       try {
@@ -27,6 +28,30 @@ async function compressionRatio(text: string): Promise<number> {
       }
     });
   });
+}
+
+/** Compress text with gzip and return ratio (compressed / original). */
+async function gzipCompressionRatio(text: string): Promise<number> {
+  const input = Buffer.from(text, 'utf-8');
+  const compressed = gzipSync(input);
+  return compressed.length / input.length;
+}
+
+/** Compress text with deflate and return ratio (compressed / original). */
+async function deflateCompressionRatio(text: string): Promise<number> {
+  const input = Buffer.from(text, 'utf-8');
+  const compressed = deflateSync(input);
+  return compressed.length / input.length;
+}
+
+/** Average compression ratio across zstd, gzip, and deflate for a more robust C approximation. */
+async function compressionRatio(text: string): Promise<number> {
+  const [zstdRatio, gzipRatio, deflateRatio] = await Promise.all([
+    zstdCompressionRatio(text),
+    gzipCompressionRatio(text),
+    deflateCompressionRatio(text),
+  ]);
+  return (zstdRatio + gzipRatio + deflateRatio) / 3;
 }
 
 /** Ask Claude to rate generation complexity (how unlikely this pattern is by chance). */
@@ -42,7 +67,7 @@ async function rateGenerationComplexity(
   });
 
   const raw = response.content
-    .filter((block): block is Anthropic.TextBlock => block.type === 'text')
+    .filter((block) => block.type === 'text')
     .map((block) => block.text)
     .join('\n');
 

@@ -1,6 +1,6 @@
 // src/evaluation/unificationScorer.ts — Explanatory unification scoring
 
-import Anthropic from '@anthropic-ai/sdk';
+import { claudeClient } from '../shared/claudeClient';
 import { Insight, Puzzle, UnificationResult, DDLConfig } from '../shared/types';
 import { UNIFICATION_SYSTEM, unificationPrompt } from './prompts';
 
@@ -24,7 +24,7 @@ export async function runUnificationCheck(
     return { puzzlesResolved: [], unificationScore: 0 };
   }
 
-  const client = new Anthropic({ apiKey: config.anthropicApiKey });
+  const client = claudeClient;
 
   const puzzleList = otherPuzzles.map((p) => ({
     id: p.id,
@@ -46,7 +46,7 @@ export async function runUnificationCheck(
   });
 
   const text = response.content
-    .filter((block): block is Anthropic.TextBlock => block.type === 'text')
+    .filter((block) => block.type === 'text')
     .map((block) => block.text)
     .join('');
 

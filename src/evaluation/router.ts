@@ -1,6 +1,6 @@
 // src/evaluation/router.ts — Domain-aware routing (hard vs soft path)
 
-import Anthropic from '@anthropic-ai/sdk';
+import { claudeClient } from '../shared/claudeClient';
 import { Insight, EvaluationPath, DDLConfig } from '../shared/types';
 import { ROUTING_SYSTEM, routingPrompt } from './prompts';
 
@@ -18,7 +18,7 @@ export async function routeInsight(
   insight: Insight,
   config: DDLConfig
 ): Promise<RoutingDecision> {
-  const client = new Anthropic({ apiKey: config.anthropicApiKey });
+  const client = claudeClient;
 
   const userPrompt = routingPrompt(insight.insightStatement, insight.mechanism);
 
@@ -31,7 +31,7 @@ export async function routeInsight(
   });
 
   const text = response.content
-    .filter((block): block is Anthropic.TextBlock => block.type === 'text')
+    .filter((block) => block.type === 'text')
     .map((block) => block.text)
     .join('');
 

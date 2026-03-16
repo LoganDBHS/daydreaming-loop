@@ -1,11 +1,11 @@
 // src/pipeline/insightGenerator.ts — insight generation via Claude API
 
-import Anthropic from '@anthropic-ai/sdk';
 import { randomUUID } from 'node:crypto';
 import { Concept, Puzzle, Insight } from '../shared/types';
 import { INSIGHT_SYSTEM_PROMPT, insightUserPrompt } from './prompts';
+import { claudeClient } from '../shared/claudeClient';
 
-const client = new Anthropic();
+const client = claudeClient;
 
 /**
  * Given a validated puzzle and optional enrichment concepts,
@@ -36,7 +36,7 @@ export async function generateInsight(
   });
 
   const raw = response.content
-    .filter((block): block is Anthropic.TextBlock => block.type === 'text')
+    .filter((block) => block.type === 'text')
     .map((block) => block.text)
     .join('\n');
 

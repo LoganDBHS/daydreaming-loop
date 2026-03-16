@@ -1,6 +1,6 @@
 // src/evaluation/formalVerifier.ts — Hard path: generate and execute test code
 
-import Anthropic from '@anthropic-ai/sdk';
+import { claudeClient } from '../shared/claudeClient';
 import { execFile } from 'node:child_process';
 import { writeFile, unlink } from 'node:fs/promises';
 import { join } from 'node:path';
@@ -24,7 +24,7 @@ export async function runFormalVerification(
   testApproach: string,
   config: DDLConfig
 ): Promise<FormalVerificationResult> {
-  const client = new Anthropic({ apiKey: config.anthropicApiKey });
+  const client = claudeClient;
 
   const userPrompt = formalVerificationPrompt(
     insight.insightStatement,
@@ -41,7 +41,7 @@ export async function runFormalVerification(
   });
 
   const text = response.content
-    .filter((block): block is Anthropic.TextBlock => block.type === 'text')
+    .filter((block) => block.type === 'text')
     .map((block) => block.text)
     .join('');
 

@@ -1,6 +1,6 @@
 // src/evaluation/adversarialCritic.ts — adversarial stress test for insights
 
-import Anthropic from '@anthropic-ai/sdk';
+import { claudeClient } from '../shared/claudeClient';
 import { Insight, Puzzle, AdversarialResult, DDLConfig } from '../shared/types';
 import { ADVERSARIAL_SYSTEM, adversarialPrompt } from './prompts';
 
@@ -23,7 +23,7 @@ export async function runAdversarialCritic(
   puzzle: Puzzle,
   config: DDLConfig
 ): Promise<AdversarialResult> {
-  const client = new Anthropic({ apiKey: config.anthropicApiKey });
+  const client = claudeClient;
 
   const userPrompt = adversarialPrompt(
     insight.insightStatement,
@@ -41,7 +41,7 @@ export async function runAdversarialCritic(
   });
 
   const text = response.content
-    .filter((block): block is Anthropic.TextBlock => block.type === 'text')
+    .filter((block) => block.type === 'text')
     .map((block) => block.text)
     .join('');
 

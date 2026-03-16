@@ -2,7 +2,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-const LOG_DIR = path.join(__dirname, '../../logs');
+// Use process.cwd() since tsx resolves __dirname to '.'
+const LOG_DIR = path.join(process.cwd(), 'logs');
 const LOG_FILE = path.join(LOG_DIR, 'pipeline.jsonl');
 
 function ensureLogDir() {

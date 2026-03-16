@@ -1,6 +1,6 @@
 // src/evaluation/fertilityChecker.ts — Predictive fertility evaluation
 
-import Anthropic from '@anthropic-ai/sdk';
+import { claudeClient } from '../shared/claudeClient';
 import { Insight, Puzzle, FertilityResult, DDLConfig } from '../shared/types';
 import { FERTILITY_SYSTEM, fertilityPrompt } from './prompts';
 
@@ -14,7 +14,7 @@ export async function runFertilityCheck(
   puzzle: Puzzle,
   config: DDLConfig
 ): Promise<FertilityResult> {
-  const client = new Anthropic({ apiKey: config.anthropicApiKey });
+  const client = claudeClient;
 
   const userPrompt = fertilityPrompt(
     insight.insightStatement,
@@ -31,7 +31,7 @@ export async function runFertilityCheck(
   });
 
   const text = response.content
-    .filter((block): block is Anthropic.TextBlock => block.type === 'text')
+    .filter((block) => block.type === 'text')
     .map((block) => block.text)
     .join('');
 

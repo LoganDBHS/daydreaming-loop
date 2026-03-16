@@ -1,11 +1,11 @@
 // src/pipeline/puzzleGenerator.ts — puzzle generation via Claude API
 
-import Anthropic from '@anthropic-ai/sdk';
 import { randomUUID } from 'node:crypto';
 import { ConceptPair, Puzzle } from '../shared/types';
 import { PUZZLE_SYSTEM_PROMPT, puzzleUserPrompt } from './prompts';
+import { claudeClient } from '../shared/claudeClient';
 
-const client = new Anthropic();
+const client = claudeClient;
 
 interface GeneratePuzzleResult {
   puzzle: Puzzle | null;
@@ -35,7 +35,7 @@ export async function generatePuzzle(
   });
 
   const raw = response.content
-    .filter((block): block is Anthropic.TextBlock => block.type === 'text')
+    .filter((block) => block.type === 'text')
     .map((block) => block.text)
     .join('\n');
 

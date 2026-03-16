@@ -1,14 +1,46 @@
-// src/dashboard/reviewStore.ts — in-memory store for review candidates and decisions
+// src/dashboard/reviewStore.ts — persisted store for review candidates and decisions
+import fs from 'fs';
+import path from 'path';
 import { ReviewCandidate, ReviewDecision } from '../shared/types';
 import { logReviewDecision } from './logger';
 
-const candidates = new Map<string, ReviewCandidate>();
-const decisions = new Map<string, ReviewDecision>();
+// ── File persistence setup ──
+
+// Use process.cwd() since tsx resolves __dirname to '.'
+const DATA_DIR = path.join(process.cwd(), 'data');
+const CANDIDATES_FILE = path.join(DATA_DIR, 'review-candidates.json');
+const DECISIONS_FILE = path.join(DATA_DIR, 'review-decisions.json');
+
+if (!fs.existsSync(DATA_DIR)) {
+  fs.mkdirSync(DATA_DIR, { recursive: true });
+}
+
+function loadMap<T>(filePath: string): Map<string, T> {
+  if (!fs.existsSync(filePath)) return new Map();
+  try {
+    const raw = fs.readFileSync(filePath, 'utf-8');
+    const entries: [string, T][] = JSON.parse(raw);
+    return new Map(entries);
+  } catch {
+    return new Map();
+  }
+}
+
+function persistMap<T>(filePath: string, map: Map<string, T>) {
+  const entries = Array.from(map.entries());
+  fs.writeFileSync(filePath, JSON.stringify(entries, null, 2));
+}
+
+// ── Load existing data on module init ──
+
+const candidates = loadMap<ReviewCandidate>(CANDIDATES_FILE);
+const decisions = loadMap<ReviewDecision>(DECISIONS_FILE);
 
 // ── Candidates ──
 
 export function addCandidate(candidate: ReviewCandidate) {
   candidates.set(candidate.insight.id, candidate);
+  persistMap(CANDIDATES_FILE, candidates);
 }
 
 export function getCandidate(insightId: string): ReviewCandidate | undefined {
@@ -36,6 +68,7 @@ export function getReviewedCandidates(): Array<{ candidate: ReviewCandidate; dec
 
 export function submitDecision(decision: ReviewDecision) {
   decisions.set(decision.candidateId, decision);
+  persistMap(DECISIONS_FILE, decisions);
   logReviewDecision(
     decision.candidateId,
     decision.decision,

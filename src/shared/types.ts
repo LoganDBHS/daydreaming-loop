@@ -171,7 +171,7 @@ export interface DDLConfig {
   };
 
   // API
-  anthropicApiKey: string;
+  anthropicApiKey: string;          // can be an API key (sk-ant-api...) or OAuth token (sk-ant-oat...)
   modelId: string;                  // "claude-opus-4-6-20250219" or latest
 
   // Novelty search

@@ -208,35 +208,35 @@ Respond in JSON:
 
 // ── NOVELTY SEARCH ──
 
-export const NOVELTY_SYSTEM = `You are a literature review specialist. Compare a proposed insight against existing published work to determine if the insight is genuinely novel or already known.`;
+export const NOVELTY_SYSTEM = `You are a literature and patent review specialist. Compare a proposed insight against existing published academic papers AND granted/pending patents to determine if the insight is genuinely novel or already known. Treat patent claims with the same weight as academic publications — if a patent already claims the same core idea, the insight is not novel.`;
 
 export function noveltyComparisonPrompt(
   insightStatement: string,
-  papers: Array<{ title: string; abstract?: string; url: string }>
+  papers: Array<{ title: string; abstract?: string; url: string; source?: string }>
 ): string {
   const paperList = papers
     .map(
       (p, i) =>
-        `  ${i + 1}. "${p.title}"${p.abstract ? `\n     Abstract: ${p.abstract}` : ''}\n     URL: ${p.url}`
+        `  ${i + 1}. [${p.source === 'google_patents' ? 'PATENT' : p.source === 'patent_search' ? 'PATENT-RELATED' : 'PAPER'}] "${p.title}"${p.abstract ? `\n     Abstract: ${p.abstract}` : ''}\n     URL: ${p.url}`
     )
     .join('\n');
 
-  return `Compare this insight against existing published work.
+  return `Compare this insight against existing published academic papers and patents.
 
 INSIGHT: ${insightStatement}
 
-EXISTING WORK FOUND:
-${paperList || '  (No relevant papers found)'}
+EXISTING WORK FOUND (academic papers and patents):
+${paperList || '  (No relevant papers or patents found)'}
 
-For each paper, assess whether it already contains the same core idea as the insight.
+For each paper or patent, assess whether it already contains the same core idea as the insight. Pay special attention to patent claims — a patent claiming the same mechanism or application means the insight is not novel.
 
 Respond in JSON:
 {
   "assessments": [
     {
-      "title": "paper title",
-      "url": "paper url",
-      "similarityAssessment": "how similar — does this paper already make the same claim?"
+      "title": "paper or patent title",
+      "url": "paper or patent url",
+      "similarityAssessment": "how similar — does this paper/patent already make the same claim?"
     }
   ],
   "isNovel": true/false,
@@ -245,7 +245,7 @@ Respond in JSON:
 }
 
 export function noveltyQueryPrompt(insightStatement: string): string {
-  return `Extract the core empirical claim from this insight as a concise search query (5-10 words, suitable for academic paper search):
+  return `Extract the core empirical claim from this insight as a concise search query (5-10 words, suitable for searching academic papers and patent databases):
 
 INSIGHT: ${insightStatement}
 
@@ -254,17 +254,55 @@ Respond with ONLY the search query, nothing else.`;
 
 // ── GROUNDING CHECK ──
 
-export const GROUNDING_SYSTEM = `You are a fact-checker. Extract key factual claims from an insight and evaluate whether any contradict well-established knowledge. Be precise — flag only genuine contradictions, not mere disagreements with current theories.`;
+export const GROUNDING_SYSTEM = `You are a fact-checker. Extract key factual claims from an insight and evaluate whether any contradict well-established knowledge. Be precise — flag only genuine contradictions, not mere disagreements with current theories.
 
-export function groundingPrompt(insightStatement: string, mechanism: string): string {
-  return `Extract and verify the key factual claims in this insight.
+When Wikidata facts are provided, use them as a primary source of structured knowledge. Wikidata is a curated, community-maintained knowledge base — treat its facts as reliable unless you have strong reason to believe otherwise. Cross-reference the insight's claims against both the Wikidata facts and your own training data.`;
+
+export function groundingEntityExtractionPrompt(insightStatement: string, mechanism: string): string {
+  return `Extract the key named entities and factual claims from this insight that could be verified against a structured knowledge base like Wikidata.
 
 INSIGHT: ${insightStatement}
 MECHANISM: ${mechanism}
 
+For each entity, provide a search term suitable for looking up in Wikidata.
+Focus on: people, organizations, scientific concepts, biological entities, chemical compounds, historical events, locations, and quantifiable facts.
+
+Respond in JSON:
+{
+  "entities": [
+    {
+      "name": "the entity or concept name",
+      "searchTerm": "best search term for Wikidata lookup",
+      "relevantProperties": ["short descriptions of what facts to check, e.g. 'instance of', 'part of', 'discovered by'"]
+    }
+  ],
+  "claims": [
+    {
+      "claim": "a specific factual claim made by the insight",
+      "entitiesInvolved": ["entity names involved in this claim"]
+    }
+  ]
+}`;
+}
+
+export function groundingPrompt(
+  insightStatement: string,
+  mechanism: string,
+  wikidataContext?: string
+): string {
+  const wikidataSection = wikidataContext
+    ? `\nWIKIDATA FACTS (structured knowledge from Wikidata for entities mentioned in the insight):\n${wikidataContext}\n\nUse these Wikidata facts as an additional source of ground truth when evaluating claims. If a claim contradicts a Wikidata fact, flag it and cite "Wikidata" as the source.\n`
+    : '';
+
+  return `Extract and verify the key factual claims in this insight.
+
+INSIGHT: ${insightStatement}
+MECHANISM: ${mechanism}
+${wikidataSection}
 1. List every factual claim (explicit or implied) that the insight depends on.
 2. For each claim, assess if it contradicts well-established knowledge.
 3. Only flag genuine contradictions with established facts, not speculative disagreements.
+4. ${wikidataContext ? 'Cross-reference claims against both the Wikidata facts above and your own knowledge.' : 'Use your knowledge of established facts across relevant fields.'}
 
 Respond in JSON:
 {
@@ -273,7 +311,7 @@ Respond in JSON:
       "claim": "the factual claim",
       "status": "supported" | "contradicted" | "unverifiable",
       "contradictedBy": "what established fact contradicts this, if any",
-      "source": "field or reference"
+      "source": "field or reference (use 'Wikidata' when applicable)"
     }
   ],
   "isGrounded": true/false,

@@ -12,7 +12,7 @@
     .stats { display: flex; gap: 16px; font-size: 0.85rem; }
     .stats span { background: rgba(255,255,255,0.15); padding: 4px 10px; border-radius: 4px; }
     .container { max-width: 1100px; margin: 24px auto; padding: 0 16px; }
-    .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
     .tabs button { padding: 8px 16px; border: 1px solid #ccc; background: #fff; border-radius: 4px; cursor: pointer; font-size: 0.9rem; }
     .tabs button.active { background: #1a1a2e; color: #fff; border-color: #1a1a2e; }
     .card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 20px; margin-bottom: 16px; }
@@ -25,6 +25,7 @@
     .score-good { background: #d4edda; color: #155724; }
     .score-ok { background: #fff3cd; color: #856404; }
     .score-bad { background: #f8d7da; color: #721c24; }
+    .score-info { background: #d1ecf1; color: #0c5460; }
     .provenance { font-size: 0.85rem; color: #444; background: #f9f9f9; padding: 10px; border-radius: 4px; }
     .provenance p { margin-bottom: 4px; }
     .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; padding-top: 12px; border-top: 1px solid #eee; }
@@ -51,10 +52,10 @@
     pre { background: #272822; color: #f8f8f2; padding: 10px; border-radius: 4px; overflow-x: auto; font-size: 0.8rem; margin-top: 4px; }
     ul.attacks li, ul.predictions li, ul.works li { font-size: 0.85rem; margin-bottom: 4px; }
 
-    /* ── Concept input styles ── */
+    /* -- Input panel -- */
     .input-panel { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 20px; margin-bottom: 16px; }
     .input-panel h2 { font-size: 1.1rem; margin-bottom: 16px; }
-    .input-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+    .input-tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
     .input-tabs button { padding: 6px 14px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; cursor: pointer; font-size: 0.85rem; }
     .input-tabs button.active { background: #1a1a2e; color: #fff; border-color: #1a1a2e; }
     .input-form { display: none; }
@@ -72,12 +73,63 @@
     .concept-item { background: #f9f9f9; border: 1px solid #eee; border-radius: 6px; padding: 12px; margin-bottom: 8px; }
     .concept-item .concept-text { font-size: 0.9rem; margin-bottom: 4px; }
     .concept-item .concept-meta { font-size: 0.75rem; color: #888; }
+
+    /* -- Config panel -- */
+    .config-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .config-group { background: #f9f9f9; border: 1px solid #eee; border-radius: 6px; padding: 16px; }
+    .config-group h4 { font-size: 0.95rem; margin-bottom: 12px; color: #333; }
+    .config-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .config-row label { font-size: 0.8rem; color: #555; min-width: 140px; }
+    .config-row input { width: 80px; padding: 4px 6px; border: 1px solid #ccc; border-radius: 3px; font-size: 0.85rem; }
+    .config-row .hint { font-size: 0.7rem; color: #999; }
+
+    /* -- Logs panel -- */
+    .log-entry { font-size: 0.8rem; padding: 6px 10px; border-bottom: 1px solid #eee; font-family: 'Courier New', monospace; }
+    .log-entry:nth-child(even) { background: #f9f9f9; }
+    .log-type { font-weight: 600; display: inline-block; min-width: 160px; }
+    .log-time { color: #888; margin-right: 8px; }
+
+    /* -- Schedule panel -- */
+    .schedule-status { padding: 12px; background: #f0f0f0; border-radius: 6px; margin-bottom: 12px; font-size: 0.9rem; }
+    .schedule-active { background: #d4edda; }
+
+    /* -- Bar chart -- */
+    .bar-row { display: flex; align-items: center; margin-bottom: 6px; }
+    .bar-label { width: 180px; font-size: 0.85rem; }
+    .bar-track { flex: 1; background: #eee; border-radius: 3px; height: 20px; margin: 0 8px; }
+    .bar-fill { height: 100%; border-radius: 3px; min-width: 2px; }
+    .bar-value { font-size: 0.85rem; font-weight: 600; width: 60px; text-align: right; }
+
+    /* -- Recommendation cards -- */
+    .rec-card { background: #fff3cd; border: 1px solid #ffc107; border-radius: 6px; padding: 12px; margin-bottom: 8px; font-size: 0.85rem; }
+    .rec-card.info { background: #d1ecf1; border-color: #17a2b8; }
+
+    /* -- Candidate toolbar -- */
+    .candidate-toolbar { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 12px 16px; }
+    .candidate-toolbar input[type="text"] { padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.85rem; min-width: 220px; }
+    .candidate-toolbar select { padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.85rem; }
+    .candidate-toolbar .bulk-toggle { padding: 6px 14px; border: 1px solid #1a1a2e; background: #fff; color: #1a1a2e; border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: 600; }
+    .candidate-toolbar .bulk-toggle.active { background: #1a1a2e; color: #fff; }
+
+    /* -- Bulk action bar -- */
+    .bulk-action-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #1a1a2e; color: #fff; padding: 12px 24px; display: flex; gap: 12px; align-items: center; justify-content: center; z-index: 100; box-shadow: 0 -2px 8px rgba(0,0,0,0.2); }
+    .bulk-action-bar button { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: 600; }
+    .bulk-action-bar .bulk-count { font-size: 0.9rem; margin: 0 8px; }
+    .bulk-action-bar select { padding: 6px 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.85rem; }
+
+    /* -- Bulk checkbox on cards -- */
+    .bulk-checkbox { margin-right: 10px; transform: scale(1.3); vertical-align: middle; cursor: pointer; }
+
+    @media (max-width: 768px) {
+      .config-grid { grid-template-columns: 1fr; }
+      header { flex-direction: column; gap: 12px; }
+    }
   </style>
 </head>
 <body>
   <header>
     <h1>DDL Review Dashboard</h1>
-    <div style="display:flex;align-items:center;gap:16px">
+    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
       <div style="display:flex;align-items:center;gap:6px">
         <label for="batch-size" style="font-size:0.8rem;opacity:0.8;white-space:nowrap">Batch:</label>
         <input id="batch-size" type="number" min="1" max="50" value="5" style="width:52px;padding:5px 6px;border:none;border-radius:4px;font-size:0.85rem;text-align:center">
@@ -86,42 +138,79 @@
       <div class="stats" id="stats"></div>
     </div>
   </header>
+
   <div id="pipeline-status" style="display:none;background:#eef;border-bottom:1px solid #ccd;padding:10px 24px;font-size:0.85rem">
     <div style="display:flex;align-items:center;gap:12px">
       <span id="pipeline-indicator" style="font-weight:600"></span>
       <span id="pipeline-msg" style="color:#444"></span>
     </div>
+    <div id="pipeline-progress" style="display:none;margin-top:8px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span id="pipeline-phase" style="font-size:0.8rem;color:#555;min-width:140px"></span>
+        <div style="flex:1;background:#dde;border-radius:4px;height:18px;overflow:hidden">
+          <div id="pipeline-progress-bar" style="height:100%;background:#28a745;border-radius:4px;transition:width 0.3s ease;width:0%"></div>
+        </div>
+        <span id="pipeline-progress-text" style="font-size:0.8rem;color:#555;min-width:60px;text-align:right"></span>
+      </div>
+    </div>
     <div id="pipeline-result" style="margin-top:6px;display:none"></div>
   </div>
+
   <div class="container">
     <div class="tabs">
       <button data-tab="concepts">Concepts</button>
-      <button class="active" data-tab="pending">Pending</button>
-      <button data-tab="reviewed">Reviewed</button>
-      <button data-tab="all">All</button>
+      <button class="active" data-tab="pending">Pending Review</button>
+      <button data-tab="approved">Approved</button>
+      <button data-tab="rejected">Rejected</button>
+      <button data-tab="reviewed">All Reviewed</button>
+      <button data-tab="all">All Candidates</button>
       <button data-tab="analytics">Analytics</button>
+      <button data-tab="config">Config</button>
+      <button data-tab="schedule">Schedule</button>
+      <button data-tab="logs">Logs</button>
     </div>
 
-    <!-- Concepts panel -->
-    <div id="concepts-panel" style="display:none">
+    <!-- ═══ Concepts Panel ═══ -->
+    <div id="concepts-panel" class="tab-panel" style="display:none">
       <div class="input-panel">
         <h2>Add New Concepts</h2>
         <div id="input-msg"></div>
         <div class="input-tabs">
-          <button class="active" data-input="text">Text</button>
+          <button class="active" data-input="text">Direct Text</button>
+          <button data-input="structured">Structured Entry</button>
           <button data-input="url">URL</button>
-          <button data-input="document">Document</button>
+          <button data-input="document">Document Upload</button>
+          <button data-input="bulk-urls">Bulk URLs</button>
+          <button data-input="citation">Citation Import</button>
         </div>
 
         <!-- Text input -->
         <form class="input-form active" id="form-text" onsubmit="return submitText(event)">
           <label>Concept Text</label>
-          <textarea id="concept-text" placeholder="Describe the concept — a paragraph or a few sentences..."></textarea>
+          <textarea id="concept-text" placeholder="Describe the concept -- a paragraph or a few sentences..."></textarea>
           <label>Source</label>
           <input id="concept-source" type="text" placeholder="e.g. 'Shannon 1948', 'Manual entry', 'Neuroscience textbook'">
           <label>Domain</label>
           <input id="concept-domain" type="text" placeholder="e.g. 'information theory', 'neuroscience', 'economics'">
           <button type="submit" id="btn-text">Add Concept</button>
+        </form>
+
+        <!-- Structured concept entry -->
+        <form class="input-form" id="form-structured" onsubmit="return submitStructured(event)">
+          <label>Concept Name (short label)</label>
+          <input id="struct-name" type="text" placeholder="e.g. 'YOLO object detection', 'Hebbian learning'">
+          <label>Description (1-3 sentences)</label>
+          <textarea id="struct-desc" placeholder="What is this concept? Explain it concisely..." style="height:80px"></textarea>
+          <label>Domain Tag</label>
+          <input id="struct-domain" type="text" placeholder="e.g. 'computer vision', 'neuroscience'">
+          <label>Key Relationships / Tensions (optional)</label>
+          <textarea id="struct-relations" placeholder="Any known relationships to other concepts, or tensions/anomalies you've noticed..." style="height:60px"></textarea>
+          <label>Confidence Level</label>
+          <select id="struct-confidence">
+            <option value="established">Established knowledge</option>
+            <option value="speculative">Speculative / emerging</option>
+          </select>
+          <button type="submit" id="btn-struct">Add Structured Concept</button>
         </form>
 
         <!-- URL input -->
@@ -130,7 +219,10 @@
           <input id="concept-url" type="url" placeholder="https://...">
           <label>Domain</label>
           <input id="concept-url-domain" type="text" placeholder="e.g. 'machine learning', 'biology'">
-          <button type="submit" id="btn-url">Fetch & Add Concepts</button>
+          <div style="display:flex;gap:8px;margin-top:4px">
+            <button type="submit" id="btn-url">Fetch & Add Concepts</button>
+            <button type="button" id="btn-url-stage" onclick="stageUrl()" style="padding:10px 20px;background:#6c63ff;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:0.9rem;font-weight:600">Stage for Review</button>
+          </div>
         </form>
 
         <!-- Document upload -->
@@ -139,32 +231,232 @@
           <input id="concept-file" type="file" accept=".pdf,.txt,.md,.text,.html,.htm,.csv,.json">
           <label>Domain</label>
           <input id="concept-doc-domain" type="text" placeholder="e.g. 'machine learning', 'biology'">
-          <button type="submit" id="btn-doc">Upload & Chunk</button>
+          <div style="display:flex;gap:8px;margin-top:4px">
+            <button type="submit" id="btn-doc">Upload & Chunk</button>
+            <button type="button" id="btn-doc-stage" onclick="stageDocument()" style="padding:10px 20px;background:#6c63ff;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:0.9rem;font-weight:600">Stage for Review</button>
+          </div>
+        </form>
+
+        <!-- Bulk URL upload -->
+        <form class="input-form" id="form-bulk-urls" onsubmit="return submitBulkUrls(event)">
+          <label>URL List File (.txt — one URL per line, # for comments)</label>
+          <input id="bulk-url-file" type="file" accept=".txt,.text">
+          <label>Domain</label>
+          <input id="bulk-url-domain" type="text" placeholder="e.g. 'machine learning', 'biology'">
+          <button type="submit" id="btn-bulk-urls">Upload & Ingest All URLs</button>
+          <div id="bulk-url-progress" style="display:none;margin-top:12px">
+            <div style="background:#e9ecef;border-radius:4px;overflow:hidden;height:20px">
+              <div id="bulk-url-bar" style="background:#1a1a2e;height:100%;width:0%;transition:width 0.3s"></div>
+            </div>
+            <div id="bulk-url-status" style="margin-top:6px;font-size:0.85rem;color:#555"></div>
+          </div>
+          <div id="bulk-url-results" style="display:none;margin-top:12px;max-height:300px;overflow-y:auto;font-size:0.85rem;border:1px solid #ddd;border-radius:4px;padding:8px"></div>
+        </form>
+
+        <!-- Citation import -->
+        <form class="input-form" id="form-citation" onsubmit="return submitCitation(event)">
+          <label>Upload .bib or .ris file</label>
+          <input id="citation-file" type="file" accept=".bib,.ris">
+          <label>Or paste citation data (BibTeX or RIS format)</label>
+          <textarea id="citation-text" placeholder="Paste BibTeX (@article{...}) or RIS (TY  - ...) content here..." style="height:140px;font-family:'Courier New',monospace;font-size:0.8rem"></textarea>
+          <label>Domain</label>
+          <input id="citation-domain" type="text" placeholder="e.g. 'machine learning', 'neuroscience'">
+          <button type="submit" id="btn-citation">Import Citations</button>
         </form>
       </div>
 
+      <!-- Chunk staging / review area -->
+      <div id="staging-area" style="display:none;margin-bottom:16px">
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <h3>Staged Chunks for Review</h3>
+            <button onclick="closeStagingArea()" style="background:none;border:1px solid #ccc;border-radius:4px;padding:4px 10px;cursor:pointer;font-size:0.85rem">Close</button>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+            <div>
+              <span id="staging-count" style="font-size:0.9rem;font-weight:600"></span>
+              <label style="margin-left:12px;font-size:0.85rem;cursor:pointer">
+                <input type="checkbox" id="staging-select-all" checked onchange="toggleAllStagedChunks(this.checked)"> Select All / Deselect All
+              </label>
+            </div>
+            <button id="btn-approve-staged" onclick="approveSelectedChunks()" style="padding:8px 16px;background:#28a745;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:0.9rem;font-weight:600">Approve Selected Chunks</button>
+          </div>
+          <div id="staged-chunks-list" style="max-height:500px;overflow-y:auto"></div>
+        </div>
+      </div>
+
       <div id="concept-count" style="font-size:0.9rem;color:#666;margin-bottom:8px"></div>
+      <div style="margin-bottom:8px">
+        <input id="concept-search" type="text" placeholder="Filter concepts..." style="padding:6px 10px;border:1px solid #ccc;border-radius:4px;font-size:0.85rem;width:300px" oninput="filterConcepts()">
+      </div>
       <div id="concept-list" class="concept-list"></div>
     </div>
 
-    <!-- Analytics panel -->
-    <div id="analytics-panel" style="display:none">
+    <!-- ═══ Analytics Panel ═══ -->
+    <div id="analytics-panel" class="tab-panel" style="display:none">
       <div class="card">
         <h3 style="margin-bottom:16px">Pipeline Analytics</h3>
         <div id="analytics-content"><div class="empty">Loading...</div></div>
       </div>
+      <div class="card">
+        <h3 style="margin-bottom:16px">Threshold Recommendations</h3>
+        <div id="threshold-recs"><div class="empty">Loading...</div></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-bottom:16px">Pipeline Stage Breakdown</h3>
+        <div id="stage-breakdown"><div class="empty">Loading...</div></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-bottom:12px">Export Analytics</h3>
+        <button onclick="window.location.href='/api/export/analytics?format=json'" style="padding:8px 16px;background:#1a1a2e;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:0.85rem;font-weight:600">Export Analytics JSON</button>
+      </div>
     </div>
 
-    <!-- Candidates list -->
-    <div id="list"></div>
+    <!-- ═══ Config Panel ═══ -->
+    <div id="config-panel" class="tab-panel" style="display:none">
+      <div class="card">
+        <h3 style="margin-bottom:16px">Pipeline Configuration</h3>
+        <p style="font-size:0.85rem;color:#666;margin-bottom:16px">These parameters control how the pipeline runs. Changes take effect on the next pipeline run. Current values are loaded from environment variables.</p>
+        <div class="config-grid">
+          <div class="config-group">
+            <h4>Sampling</h4>
+            <div class="config-row">
+              <label>Anti-correlation Window</label>
+              <input id="cfg-acw" type="number" min="0.05" max="0.5" step="0.05" value="0.2">
+              <span class="hint">Bottom N% of similarity (0.1-0.3)</span>
+            </div>
+            <div class="config-row">
+              <label>Pair Size</label>
+              <input id="cfg-pairsize" type="number" min="2" max="5" value="2">
+              <span class="hint">Concepts per pair (default 2)</span>
+            </div>
+            <div class="config-row">
+              <label>Batch Size</label>
+              <input id="cfg-batchsize" type="number" min="1" max="100" value="5">
+              <span class="hint">Pairs per batch run</span>
+            </div>
+          </div>
+          <div class="config-group">
+            <h4>Simplicity Theory</h4>
+            <div class="config-row">
+              <label>Threshold Percentile</label>
+              <input id="cfg-stpct" type="number" min="0.5" max="0.99" step="0.01" value="0.95">
+              <span class="hint">95th percentile = top 5% pass</span>
+            </div>
+            <div class="config-row">
+              <label>Window Size</label>
+              <input id="cfg-stwin" type="number" min="10" max="1000" value="50">
+              <span class="hint">Rolling window for adaptive threshold</span>
+            </div>
+          </div>
+          <div class="config-group">
+            <h4>Evaluation Thresholds</h4>
+            <div class="config-row">
+              <label>Fertility Threshold</label>
+              <input id="cfg-fert" type="number" min="1" max="10" step="0.5" value="4">
+              <span class="hint">Discard below this (1-10)</span>
+            </div>
+            <div class="config-row">
+              <label>Resilience Threshold</label>
+              <input id="cfg-resil" type="number" min="1" max="10" step="0.5" value="4">
+              <span class="hint">Discard below this (1-10)</span>
+            </div>
+            <div class="config-row">
+              <label>Composite Threshold</label>
+              <input id="cfg-comp" type="number" min="1" max="10" step="0.5" value="5.0">
+              <span class="hint">Discard below this (1-10)</span>
+            </div>
+          </div>
+          <div class="config-group">
+            <h4>Composite Weights</h4>
+            <div class="config-row">
+              <label>Fertility Weight</label>
+              <input id="cfg-wf" type="number" min="0" max="1" step="0.05" value="0.35">
+            </div>
+            <div class="config-row">
+              <label>Resilience Weight</label>
+              <input id="cfg-wr" type="number" min="0" max="1" step="0.05" value="0.35">
+            </div>
+            <div class="config-row">
+              <label>Unification Weight</label>
+              <input id="cfg-wu" type="number" min="0" max="1" step="0.05" value="0.30">
+            </div>
+            <div style="font-size:0.75rem;color:#888;margin-top:4px">Weights should sum to 1.0</div>
+          </div>
+        </div>
+        <div style="margin-top:16px;padding-top:12px;border-top:1px solid #eee">
+          <button onclick="saveConfig()" style="padding:10px 24px;background:#1a1a2e;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:0.9rem;font-weight:600">Save Configuration</button>
+          <span id="config-msg" style="margin-left:12px;font-size:0.85rem"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Schedule Panel ═══ -->
+    <div id="schedule-panel" class="tab-panel" style="display:none">
+      <div class="card">
+        <h3 style="margin-bottom:16px">Batch Scheduling</h3>
+        <p style="font-size:0.85rem;color:#666;margin-bottom:16px">Schedule recurring pipeline runs. The pipeline will run automatically at the specified interval.</p>
+        <div id="schedule-current" class="schedule-status">Loading schedule status...</div>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:16px">
+          <div>
+            <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:4px">Interval (minutes)</label>
+            <input id="sched-interval" type="number" min="5" max="1440" value="60" style="padding:6px;border:1px solid #ccc;border-radius:4px;width:100px">
+          </div>
+          <div>
+            <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:4px">Batch Size</label>
+            <input id="sched-batch" type="number" min="1" max="50" value="5" style="padding:6px;border:1px solid #ccc;border-radius:4px;width:100px">
+          </div>
+        </div>
+        <div style="margin-top:16px;display:flex;gap:8px">
+          <button onclick="setSchedule()" style="padding:10px 20px;background:#28a745;color:#fff;border:none;border-radius:4px;cursor:pointer;font-weight:600">Start Schedule</button>
+          <button onclick="cancelSchedule()" style="padding:10px 20px;background:#dc3545;color:#fff;border:none;border-radius:4px;cursor:pointer;font-weight:600">Stop Schedule</button>
+        </div>
+        <div id="schedule-history" style="margin-top:24px">
+          <h3 style="margin-bottom:12px">Run History</h3>
+          <div id="run-history-content"><div class="empty">No pipeline runs yet.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Logs Panel ═══ -->
+    <div id="logs-panel" class="tab-panel" style="display:none">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <h3>Pipeline Logs</h3>
+          <div style="display:flex;gap:8px;align-items:center">
+            <select id="log-filter" onchange="loadLogs()" style="padding:4px 8px;border:1px solid #ccc;border-radius:4px;font-size:0.85rem">
+              <option value="">All events</option>
+              <option value="puzzle_discarded">Puzzle discarded</option>
+              <option value="insight_discarded">Insight discarded</option>
+              <option value="insight_evaluated">Insight evaluated</option>
+              <option value="review_decision">Review decisions</option>
+              <option value="concept_added">Concept added</option>
+            </select>
+            <button onclick="loadLogs()" style="padding:4px 12px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;font-size:0.85rem">Refresh</button>
+          </div>
+        </div>
+        <div id="logs-list" style="max-height:600px;overflow-y:auto;border:1px solid #eee;border-radius:4px"></div>
+      </div>
+    </div>
+
+    <!-- ═══ Candidates List (pending/reviewed/all) ═══ -->
+    <div id="list" class="tab-panel"></div>
   </div>
 
 <script>
 const API = '';
 let currentTab = 'pending';
+let allConcepts = [];
+let currentCandidates = [];
+let bulkMode = false;
+let bulkSelected = new Set();
 
 // ── Helpers ──
 function scoreBadge(label, value, max = 10) {
+  if (typeof max === 'string') {
+    const cls = String(value) === max ? 'score-good' : 'score-bad';
+    return `<span class="score-badge ${cls}">${label}: ${value}</span>`;
+  }
   const ratio = value / max;
   const cls = ratio >= 0.6 ? 'score-good' : ratio >= 0.4 ? 'score-ok' : 'score-bad';
   return `<span class="score-badge ${cls}">${label}: ${typeof value === 'number' ? value.toFixed(1) : value}</span>`;
@@ -180,6 +472,23 @@ function showMsg(text, ok) {
   setTimeout(() => { el.innerHTML = ''; }, 5000);
 }
 
+function escHtml(s) {
+  if (!s) return '';
+  const div = document.createElement('div');
+  div.textContent = String(s);
+  return div.innerHTML;
+}
+
+function timeAgo(dateStr) {
+  const d = new Date(dateStr);
+  const now = Date.now();
+  const sec = Math.floor((now - d.getTime()) / 1000);
+  if (sec < 60) return sec + 's ago';
+  if (sec < 3600) return Math.floor(sec / 60) + 'm ago';
+  if (sec < 86400) return Math.floor(sec / 3600) + 'h ago';
+  return Math.floor(sec / 86400) + 'd ago';
+}
+
 // ── Render candidate ──
 function renderCandidate(c, decision) {
   const ins = c.insight;
@@ -189,23 +498,38 @@ function renderCandidate(c, decision) {
 
   let html = `<div class="card" id="card-${ins.id}">`;
 
+  if (bulkMode && !decision && currentTab === 'pending') {
+    const checked = bulkSelected.has(ins.id) ? ' checked' : '';
+    html += `<label style="display:flex;align-items:center;margin-bottom:8px;cursor:pointer"><input type="checkbox" class="bulk-checkbox" onchange="toggleBulkSelect('${ins.id}')"${checked}> <span style="font-size:0.85rem;color:#555;margin-left:4px">Select for bulk action</span></label>`;
+  }
+
   if (decision) {
     html += `<div style="margin-bottom:8px">${decisionBadge(decision.decision)}`;
-    if (decision.rejectionReason) html += ` <span style="font-size:0.8rem;color:#666">(${decision.rejectionReason})</span>`;
+    if (decision.rejectionReason) html += ` <span style="font-size:0.8rem;color:#666">(${decision.rejectionReason.replace(/_/g, ' ')})</span>`;
     html += `</div>`;
   }
 
-  html += `<h3>${ins.insightStatement}</h3>`;
-  html += `<div class="meta">ID: ${ins.id} | Path: ${ev.path} | Created: ${new Date(ins.createdAt).toLocaleDateString()}</div>`;
-  html += `<div class="section"><div class="section-title">Mechanism</div><p style="font-size:0.9rem">${ins.mechanism}</p></div>`;
+  html += `<h3>${escHtml(ins.insightStatement)}</h3>`;
+  html += `<div class="meta">ID: ${ins.id.slice(0,8)}... | Path: ${ev.path} | Created: ${new Date(ins.createdAt).toLocaleDateString()}</div>`;
+  html += `<div class="section"><div class="section-title">Mechanism</div><p style="font-size:0.9rem">${escHtml(ins.mechanism)}</p></div>`;
   html += `<div class="section"><div class="section-title">Source Puzzle</div>`;
-  html += `<p style="font-size:0.9rem">${pz.puzzleStatement}</p>`;
-  html += `<p style="font-size:0.8rem;color:#666;margin-top:4px"><em>Why surprising:</em> ${pz.whyHardToExplain}</p></div>`;
+  html += `<p style="font-size:0.9rem">${escHtml(pz.puzzleStatement)}</p>`;
+  html += `<p style="font-size:0.8rem;color:#666;margin-top:4px"><em>Why surprising:</em> ${escHtml(pz.whyHardToExplain)}</p></div>`;
   html += `<div class="section"><div class="section-title">Source Concepts</div><div class="provenance">`;
-  html += `<p><strong>${cA.domain}:</strong> ${cA.text} <span style="font-size:0.75rem;color:#888">(${cA.source})</span></p>`;
-  html += `<p><strong>${cB.domain}:</strong> ${cB.text} <span style="font-size:0.75rem;color:#888">(${cB.source})</span></p>`;
+  html += `<p><strong>${escHtml(cA.domain)}:</strong> ${escHtml(cA.text)} <span style="font-size:0.75rem;color:#888">(${escHtml(cA.source)})</span></p>`;
+  html += `<p><strong>${escHtml(cB.domain)}:</strong> ${escHtml(cB.text)} <span style="font-size:0.75rem;color:#888">(${escHtml(cB.source)})</span></p>`;
   html += `</div></div>`;
 
+  // Enrichment concepts
+  if (c.enrichmentConcepts && c.enrichmentConcepts.length > 0) {
+    html += `<div class="section"><div class="section-title">Enrichment Concepts</div><div class="provenance">`;
+    for (const ec of c.enrichmentConcepts) {
+      html += `<p><strong>${escHtml(ec.domain)}:</strong> ${escHtml(ec.text)}</p>`;
+    }
+    html += `</div></div>`;
+  }
+
+  // Evaluation scores
   html += `<div class="section"><div class="section-title">Evaluation Scores</div><div class="scores">`;
   html += scoreBadge('Composite', ev.compositeScore);
   if (ev.fertility) html += scoreBadge('Fertility', ev.fertility.overallScore);
@@ -215,12 +539,14 @@ function renderCandidate(c, decision) {
   html += scoreBadge('Grounded', ev.grounding.isGrounded ? 'Yes' : 'No', 'Yes');
   html += `</div></div>`;
 
+  // Formal verification
   if (ev.formalVerification) {
     html += `<details><summary>Formal Verification (${ev.formalVerification.passed ? 'PASSED' : 'FAILED'})</summary>`;
     html += `<pre>${escHtml(ev.formalVerification.testCode)}</pre>`;
     html += `<p style="font-size:0.85rem;margin-top:4px">Output: ${escHtml(ev.formalVerification.output)}</p></details>`;
   }
 
+  // Predictions
   if (ev.fertility && ev.fertility.predictions.length > 0) {
     html += `<details><summary>Predictions (${ev.fertility.predictions.length})</summary><ul class="predictions">`;
     for (const p of ev.fertility.predictions) {
@@ -229,60 +555,74 @@ function renderCandidate(c, decision) {
     html += `</ul></details>`;
   }
 
+  // Adversarial attacks
   if (ev.adversarial && ev.adversarial.attacks.length > 0) {
-    html += `<details><summary>Strongest Objections (${ev.adversarial.attacks.length})</summary><ul class="attacks">`;
+    html += `<details><summary>Adversarial Critique (${ev.adversarial.attacks.length} attack vectors)</summary><ul class="attacks">`;
     for (const a of ev.adversarial.attacks) {
-      html += `<li><strong>[${a.vector}]</strong> severity ${a.severity}/10: ${escHtml(a.finding)}</li>`;
+      const sevColor = a.severity >= 7 ? '#dc3545' : a.severity >= 4 ? '#856404' : '#155724';
+      html += `<li><strong style="color:${sevColor}">[${a.vector.replace(/_/g, ' ')}]</strong> severity ${a.severity}/10: ${escHtml(a.finding)}</li>`;
     }
     html += `</ul></details>`;
   }
 
+  // Unification map
   if (ev.unification && ev.unification.puzzlesResolved && ev.unification.puzzlesResolved.length > 0) {
     const resolved = ev.unification.puzzlesResolved.filter(p => p.relevanceScore >= 6);
     html += `<details><summary>Unification Map (${resolved.length} puzzles resolved)</summary><ul class="works">`;
     for (const p of ev.unification.puzzlesResolved) {
       const cls = p.relevanceScore >= 6 ? 'color:#155724' : 'color:#888';
-      html += `<li style="${cls}">Puzzle ${escHtml(p.puzzleId.slice(0,8))}... — relevance: ${p.relevanceScore}/10</li>`;
+      html += `<li style="${cls}">Puzzle ${escHtml(p.puzzleId.slice(0,8))}... -- relevance: ${p.relevanceScore}/10</li>`;
     }
     html += `</ul></details>`;
   }
 
+  // Grounding issues
   if (ev.grounding && ev.grounding.contradictions && ev.grounding.contradictions.length > 0) {
     html += `<details><summary>Grounding Issues (${ev.grounding.contradictions.length} contradictions)</summary><ul class="attacks">`;
-    for (const c of ev.grounding.contradictions) {
-      html += `<li><strong>${escHtml(c.claim)}</strong> — contradicted by: ${escHtml(c.contradictedBy)} <span style="color:#888">(${escHtml(c.source)})</span></li>`;
+    for (const gc of ev.grounding.contradictions) {
+      html += `<li><strong>${escHtml(gc.claim)}</strong> -- contradicted by: ${escHtml(gc.contradictedBy)} <span style="color:#888">(${escHtml(gc.source)})</span></li>`;
     }
     html += `</ul></details>`;
   }
 
+  // Novelty - closest existing work
   if (ev.novelty.existingWorks.length > 0) {
     html += `<details><summary>Closest Existing Work (${ev.novelty.existingWorks.length})</summary><ul class="works">`;
     for (const w of ev.novelty.existingWorks) {
-      html += `<li><a href="${escHtml(w.url)}" target="_blank">${escHtml(w.title)}</a> — ${escHtml(w.similarityAssessment)}</li>`;
+      html += `<li><a href="${escHtml(w.url)}" target="_blank" rel="noopener">${escHtml(w.title)}</a> -- ${escHtml(w.similarityAssessment)}</li>`;
     }
     html += `</ul></details>`;
   }
 
+  // Full provenance chain
   html += `<details><summary>Full Provenance Chain</summary><div class="provenance">`;
-  html += `<p><strong>Concepts:</strong> ${cA.id} + ${cB.id}</p>`;
-  html += `<p><strong>Puzzle:</strong> ${pz.id} (U-score: ${pz.stScore.unexpectedness.toFixed(2)})</p>`;
-  if (ins.enrichmentConceptIds.length > 0) html += `<p><strong>Enrichment:</strong> ${ins.enrichmentConceptIds.join(', ')}</p>`;
-  html += `<p><strong>Insight:</strong> ${ins.id}</p>`;
+  html += `<p><strong>Step 1 - Concepts:</strong> ${cA.id.slice(0,8)}... (${escHtml(cA.domain)}) + ${cB.id.slice(0,8)}... (${escHtml(cB.domain)})</p>`;
+  html += `<p><strong>Step 2 - Puzzle:</strong> ${pz.id.slice(0,8)}... (U-score: ${pz.stScore.unexpectedness.toFixed(3)}, C: ${pz.stScore.descriptionComplexity.toFixed(3)}, Cv: ${pz.stScore.generationComplexity.toFixed(3)})</p>`;
+  if (ins.enrichmentConceptIds.length > 0) html += `<p><strong>Step 3 - Enrichment:</strong> ${ins.enrichmentConceptIds.map(id => id.slice(0,8)+'...').join(', ')}</p>`;
+  html += `<p><strong>Step ${ins.enrichmentConceptIds.length > 0 ? '4' : '3'} - Insight:</strong> ${ins.id.slice(0,8)}...</p>`;
   html += `<p><strong>How it resolves puzzle:</strong> ${escHtml(ins.howItResolvesPuzzle)}</p>`;
+  if (ins.initialPredictions && ins.initialPredictions.length > 0) {
+    html += `<p><strong>Initial predictions:</strong></p><ul style="margin-left:16px;font-size:0.85rem">`;
+    for (const pred of ins.initialPredictions) html += `<li>${escHtml(pred)}</li>`;
+    html += `</ul>`;
+  }
   html += `</div></details>`;
 
+  // Expert notes
   if (decision && decision.expertNotes) {
     html += `<div class="section" style="margin-top:8px"><div class="section-title">Expert Notes</div><p style="font-size:0.9rem">${escHtml(decision.expertNotes)}</p></div>`;
   }
 
+  // Action buttons (only for pending)
   if (!decision) {
     html += `<div class="actions">`;
     html += `<button class="btn-approve" onclick="decide('${ins.id}','approved')">Approve</button>`;
     html += `<button class="btn-reject" onclick="showRejectForm('${ins.id}')">Reject</button>`;
-    html += `<button class="btn-investigate" onclick="decide('${ins.id}','investigate')">Investigate</button>`;
-    html += `<button class="btn-refine" onclick="decide('${ins.id}','refine')">Refine</button>`;
+    html += `<button class="btn-investigate" onclick="decideWithNotes('${ins.id}','investigate')">Investigate</button>`;
+    html += `<button class="btn-refine" onclick="decideWithNotes('${ins.id}','refine')">Refine</button>`;
     html += `</div>`;
-    html += `<div class="decision-form" id="form-${ins.id}">`;
+    // Rejection form
+    html += `<div class="decision-form" id="reject-form-${ins.id}">`;
     html += `<label style="font-size:0.85rem;font-weight:600">Rejection Reason</label>`;
     html += `<select id="reason-${ins.id}">`;
     html += `<option value="trivially_obvious">Trivially obvious</option>`;
@@ -292,11 +632,20 @@ function renderCandidate(c, decision) {
     html += `<option value="too_vague">Too vague</option>`;
     html += `<option value="rhetorical_mimicry">Rhetorical mimicry</option>`;
     html += `</select>`;
-    html += `<label style="font-size:0.85rem;font-weight:600">Notes (optional)</label>`;
-    html += `<textarea id="notes-${ins.id}" placeholder="Add notes..."></textarea>`;
+    html += `<label style="font-size:0.85rem;font-weight:600">Expert Notes (optional)</label>`;
+    html += `<textarea id="notes-${ins.id}" placeholder="Add notes about why this was rejected..."></textarea>`;
     html += `<div class="submit-row">`;
     html += `<button style="background:#dc3545;color:#fff" onclick="submitReject('${ins.id}')">Confirm Reject</button>`;
-    html += `<button style="background:#999;color:#fff" onclick="hideForm('${ins.id}')">Cancel</button>`;
+    html += `<button style="background:#999;color:#fff" onclick="hideForm('reject-form-${ins.id}')">Cancel</button>`;
+    html += `</div></div>`;
+    // Notes form (for investigate/refine)
+    html += `<div class="decision-form" id="notes-form-${ins.id}">`;
+    html += `<input type="hidden" id="notes-decision-${ins.id}" value="">`;
+    html += `<label style="font-size:0.85rem;font-weight:600">Expert Notes</label>`;
+    html += `<textarea id="action-notes-${ins.id}" placeholder="What should be investigated or how should this be refined?"></textarea>`;
+    html += `<div class="submit-row">`;
+    html += `<button style="background:#1a1a2e;color:#fff" onclick="submitWithNotes('${ins.id}')">Submit</button>`;
+    html += `<button style="background:#999;color:#fff" onclick="hideForm('notes-form-${ins.id}')">Cancel</button>`;
     html += `</div></div>`;
   }
 
@@ -304,19 +653,14 @@ function renderCandidate(c, decision) {
   return html;
 }
 
-function escHtml(s) {
-  if (!s) return '';
-  const div = document.createElement('div');
-  div.textContent = String(s);
-  return div.innerHTML;
-}
-
 // ── API: Stats & Candidates ──
 async function loadStats() {
   try {
-    const res = await fetch(`${API}/api/stats`);
-    const s = await res.json();
-    const countRes = await fetch(`${API}/api/concepts/count`);
+    const [statsRes, countRes] = await Promise.all([
+      fetch(`${API}/api/stats`),
+      fetch(`${API}/api/concepts/count`),
+    ]);
+    const s = await statsRes.json();
     const c = await countRes.json();
     document.getElementById('stats').innerHTML =
       `<span>Concepts: ${c.count}</span>` +
@@ -329,28 +673,170 @@ async function loadStats() {
   }
 }
 
-async function loadCandidates() {
-  const filter = currentTab === 'all' ? '' : currentTab;
-  if (filter === 'concepts') return;
-  const url = filter ? `${API}/api/candidates?filter=${filter}` : `${API}/api/candidates`;
-  const res = await fetch(url);
-  const data = await res.json();
-  const list = document.getElementById('list');
+function sortCandidates(items, sortBy) {
+  const sorted = [...items];
+  switch (sortBy) {
+    case 'newest':
+      sorted.sort((a, b) => new Date((b.candidate || b).insight.createdAt) - new Date((a.candidate || a).insight.createdAt));
+      break;
+    case 'oldest':
+      sorted.sort((a, b) => new Date((a.candidate || a).insight.createdAt) - new Date((b.candidate || b).insight.createdAt));
+      break;
+    case 'highest':
+      sorted.sort((a, b) => (b.candidate || b).evaluation.compositeScore - (a.candidate || a).evaluation.compositeScore);
+      break;
+    case 'lowest':
+      sorted.sort((a, b) => (a.candidate || a).evaluation.compositeScore - (b.candidate || b).evaluation.compositeScore);
+      break;
+  }
+  return sorted;
+}
 
-  if (data.length === 0) {
-    list.innerHTML = '<div class="empty">No candidates to show.</div>';
+function filterCandidatesSearch(items, query) {
+  if (!query) return items;
+  const q = query.toLowerCase();
+  return items.filter(item => {
+    const c = item.candidate || item;
+    return (c.insight.insightStatement || '').toLowerCase().includes(q)
+      || (c.puzzle.puzzleStatement || '').toLowerCase().includes(q)
+      || (c.sourceConcepts[0]?.text || '').toLowerCase().includes(q)
+      || (c.sourceConcepts[1]?.text || '').toLowerCase().includes(q);
+  });
+}
+
+function getCandidateToolbarHTML() {
+  const searchVal = document.getElementById('candidate-search')?.value || '';
+  const sortVal = document.getElementById('candidate-sort')?.value || 'newest';
+  let html = '<div class="candidate-toolbar">';
+  html += `<input type="text" id="candidate-search" placeholder="Search insights, puzzles, concepts..." value="${escHtml(searchVal)}" oninput="renderCandidateList()">`;
+  html += `<select id="candidate-sort" onchange="renderCandidateList()">`;
+  html += `<option value="newest"${sortVal === 'newest' ? ' selected' : ''}>Newest first</option>`;
+  html += `<option value="oldest"${sortVal === 'oldest' ? ' selected' : ''}>Oldest first</option>`;
+  html += `<option value="highest"${sortVal === 'highest' ? ' selected' : ''}>Highest score</option>`;
+  html += `<option value="lowest"${sortVal === 'lowest' ? ' selected' : ''}>Lowest score</option>`;
+  html += `</select>`;
+  if (currentTab === 'pending') {
+    html += `<button class="bulk-toggle ${bulkMode ? 'active' : ''}" onclick="toggleBulkMode()">Bulk Mode</button>`;
+  }
+  html += '</div>';
+  return html;
+}
+
+function getBulkActionBarHTML() {
+  let html = '<div class="bulk-action-bar" id="bulk-bar">';
+  html += '<button style="background:#fff;color:#333" onclick="bulkSelectAll()">Select All</button>';
+  html += '<button style="background:#fff;color:#333" onclick="bulkDeselectAll()">Deselect All</button>';
+  html += `<span class="bulk-count"><span id="bulk-count-num">${bulkSelected.size}</span> selected</span>`;
+  html += '<button class="btn-approve" onclick="bulkApprove()">Approve All Selected</button>';
+  html += '<select id="bulk-reject-reason" style="margin-left:4px"><option value="trivially_obvious">Trivially obvious</option><option value="already_known">Already known</option><option value="factually_wrong">Factually wrong</option><option value="not_actionable">Not actionable</option><option value="too_vague">Too vague</option><option value="rhetorical_mimicry">Rhetorical mimicry</option></select>';
+  html += '<button class="btn-reject" onclick="bulkReject()">Reject All Selected</button>';
+  html += '</div>';
+  return html;
+}
+
+function toggleBulkMode() {
+  bulkMode = !bulkMode;
+  bulkSelected.clear();
+  renderCandidateList();
+}
+
+function toggleBulkSelect(id) {
+  if (bulkSelected.has(id)) bulkSelected.delete(id);
+  else bulkSelected.add(id);
+  const countEl = document.getElementById('bulk-count-num');
+  if (countEl) countEl.textContent = bulkSelected.size;
+}
+
+function bulkSelectAll() {
+  for (const item of currentCandidates) {
+    bulkSelected.add((item.candidate || item).insight.id);
+  }
+  renderCandidateList();
+}
+
+function bulkDeselectAll() {
+  bulkSelected.clear();
+  renderCandidateList();
+}
+
+async function bulkApprove() {
+  if (bulkSelected.size === 0) { alert('No candidates selected'); return; }
+  if (!confirm(`Approve ${bulkSelected.size} candidate(s)?`)) return;
+  const ids = [...bulkSelected];
+  for (const id of ids) { await decide(id, 'approved'); }
+  bulkSelected.clear();
+  bulkMode = false;
+}
+
+async function bulkReject() {
+  if (bulkSelected.size === 0) { alert('No candidates selected'); return; }
+  const reason = document.getElementById('bulk-reject-reason')?.value || 'trivially_obvious';
+  if (!confirm(`Reject ${bulkSelected.size} candidate(s) as "${reason.replace(/_/g, ' ')}"?`)) return;
+  const ids = [...bulkSelected];
+  for (const id of ids) { await decide(id, 'rejected', reason); }
+  bulkSelected.clear();
+  bulkMode = false;
+}
+
+function renderCandidateList() {
+  const list = document.getElementById('list');
+  const searchEl = document.getElementById('candidate-search');
+  const sortEl = document.getElementById('candidate-sort');
+  const query = searchEl ? searchEl.value : '';
+  const sortBy = sortEl ? sortEl.value : 'newest';
+
+  let items = filterCandidatesSearch(currentCandidates, query);
+  items = sortCandidates(items, sortBy);
+
+  if (items.length === 0 && currentCandidates.length > 0) {
+    list.innerHTML = getCandidateToolbarHTML() + '<div class="empty">No candidates match your search.</div>';
+    return;
+  }
+  if (items.length === 0) {
+    const msgs = {
+      pending: 'No candidates awaiting review. Run the pipeline to generate insights.',
+      approved: 'No approved insights yet. Review pending candidates to approve discoveries.',
+      rejected: 'No rejected insights yet.',
+      reviewed: 'No reviewed candidates yet.',
+      all: 'No candidates yet. Run the pipeline to generate insights.',
+    };
+    list.innerHTML = `<div class="empty">${msgs[currentTab] || msgs.all}</div>`;
     return;
   }
 
-  let html = '';
-  for (const item of data) {
+  let html = getCandidateToolbarHTML();
+
+  // Export bar for approved tab
+  if (currentTab === 'approved') {
+    html += `<div style="display:flex;gap:8px;margin-bottom:16px;padding:12px;background:#fff;border:1px solid #ddd;border-radius:8px;align-items:center">`;
+    html += `<span style="font-size:0.85rem;font-weight:600;color:#555;margin-right:8px">Export Approved:</span>`;
+    html += `<button onclick="window.location.href='/api/export/approved?format=json'" style="padding:6px 14px;background:#1a1a2e;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:0.8rem;font-weight:600">JSON</button>`;
+    html += `<button onclick="window.location.href='/api/export/approved?format=csv'" style="padding:6px 14px;background:#28a745;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:0.8rem;font-weight:600">CSV</button>`;
+    html += `<button onclick="window.location.href='/api/export/approved?format=markdown'" style="padding:6px 14px;background:#17a2b8;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:0.8rem;font-weight:600">Markdown</button>`;
+    html += `</div>`;
+  }
+
+  for (const item of items) {
     if (item.candidate) {
       html += renderCandidate(item.candidate, item.decision);
     } else {
       html += renderCandidate(item, null);
     }
   }
+  if (bulkMode && currentTab === 'pending') {
+    html += getBulkActionBarHTML();
+  }
   list.innerHTML = html;
+}
+
+async function loadCandidates() {
+  const filter = currentTab === 'all' ? '' : currentTab;
+  if (['concepts', 'analytics', 'config', 'schedule', 'logs'].includes(filter)) return;
+  const url = filter ? `${API}/api/candidates?filter=${filter}` : `${API}/api/candidates`;
+  const res = await fetch(url);
+  const data = await res.json();
+  currentCandidates = data;
+  renderCandidateList();
 }
 
 async function decide(candidateId, decision, rejectionReason, notes) {
@@ -366,11 +852,11 @@ async function decide(candidateId, decision, rejectionReason, notes) {
     });
     if (!res.ok) {
       const err = await res.json();
-      console.error('Decision failed:', err);
+      alert('Decision failed: ' + (err.error || 'Unknown error'));
       return;
     }
   } catch (e) {
-    console.error('Decision request failed:', e);
+    alert('Decision request failed: ' + (e.message || e));
     return;
   }
   await loadStats();
@@ -378,11 +864,11 @@ async function decide(candidateId, decision, rejectionReason, notes) {
 }
 
 function showRejectForm(id) {
-  document.getElementById(`form-${id}`).style.display = 'block';
+  document.getElementById(`reject-form-${id}`).style.display = 'block';
 }
 
-function hideForm(id) {
-  document.getElementById(`form-${id}`).style.display = 'none';
+function hideForm(formId) {
+  document.getElementById(formId).style.display = 'none';
 }
 
 function submitReject(id) {
@@ -391,31 +877,63 @@ function submitReject(id) {
   decide(id, 'rejected', reason, notes || undefined);
 }
 
+function decideWithNotes(id, decision) {
+  document.getElementById(`notes-decision-${id}`).value = decision;
+  document.getElementById(`notes-form-${id}`).style.display = 'block';
+}
+
+function submitWithNotes(id) {
+  const decision = document.getElementById(`notes-decision-${id}`).value;
+  const notes = document.getElementById(`action-notes-${id}`).value;
+  decide(id, decision, undefined, notes || undefined);
+}
+
 // ── API: Concepts ──
 async function loadConcepts() {
   try {
     const res = await fetch(`${API}/api/concepts`);
-    const concepts = await res.json();
-    const list = document.getElementById('concept-list');
-    const count = document.getElementById('concept-count');
-    count.textContent = `${concepts.length} concept${concepts.length !== 1 ? 's' : ''} in database`;
-
-    if (concepts.length === 0) {
-      list.innerHTML = '<div class="empty">No concepts yet. Add some above to get started.</div>';
-      return;
-    }
-
-    let html = '';
-    for (const c of concepts) {
-      html += `<div class="concept-item">`;
-      html += `<div class="concept-text">${escHtml(c.text)}</div>`;
-      html += `<div class="concept-meta"><strong>${escHtml(c.domain)}</strong> | Source: ${escHtml(c.source)} | ${c.id.slice(0,8)}... <button onclick="removeConcept('${c.id}')" style="margin-left:8px;padding:2px 8px;background:#dc3545;color:#fff;border:none;border-radius:3px;cursor:pointer;font-size:0.75rem;">Delete</button></div>`;
-      html += `</div>`;
-    }
-    list.innerHTML = html;
-  } catch (err) {
+    allConcepts = await res.json();
+    renderConceptList(allConcepts);
+  } catch {
     document.getElementById('concept-list').innerHTML = '<div class="empty">Could not load concepts. Is ChromaDB running?</div>';
   }
+}
+
+function renderConceptList(concepts) {
+  const list = document.getElementById('concept-list');
+  const count = document.getElementById('concept-count');
+  count.textContent = `${concepts.length} concept${concepts.length !== 1 ? 's' : ''} in database`;
+
+  if (concepts.length === 0) {
+    list.innerHTML = '<div class="empty">No concepts yet. Add some above to get started.</div>';
+    return;
+  }
+
+  let html = '';
+  for (const c of concepts) {
+    const truncText = c.text.length > 300 ? c.text.slice(0, 300) + '...' : c.text;
+    html += `<div class="concept-item">`;
+    html += `<div class="concept-text">${escHtml(truncText)}</div>`;
+    html += `<div class="concept-meta">`;
+    html += `<strong>${escHtml(c.domain)}</strong> | Source: ${escHtml(c.source)} | ${c.metadata?.confidence || 'established'} | ${c.id.slice(0,8)}...`;
+    html += ` <button onclick="removeConcept('${c.id}')" style="margin-left:8px;padding:2px 8px;background:#dc3545;color:#fff;border:none;border-radius:3px;cursor:pointer;font-size:0.75rem;">Delete</button>`;
+    html += `</div></div>`;
+  }
+  list.innerHTML = html;
+}
+
+function filterConcepts() {
+  const q = document.getElementById('concept-search').value.toLowerCase();
+  if (!q) {
+    renderConceptList(allConcepts);
+    return;
+  }
+  const filtered = allConcepts.filter(c =>
+    c.text.toLowerCase().includes(q) ||
+    c.domain.toLowerCase().includes(q) ||
+    c.source.toLowerCase().includes(q)
+  );
+  renderConceptList(filtered);
 }
 
 async function submitText(e) {
@@ -443,10 +961,51 @@ async function submitText(e) {
     await loadConcepts();
     await loadStats();
   } catch (err) {
-    showMsg('Request failed — is the server running?', false);
+    showMsg('Request failed -- is the server running?', false);
   } finally {
     btn.disabled = false;
     btn.textContent = 'Add Concept';
+  }
+  return false;
+}
+
+async function submitStructured(e) {
+  e.preventDefault();
+  const name = document.getElementById('struct-name').value.trim();
+  const desc = document.getElementById('struct-desc').value.trim();
+  const domain = document.getElementById('struct-domain').value.trim();
+  const relations = document.getElementById('struct-relations').value.trim();
+  const confidence = document.getElementById('struct-confidence').value;
+
+  if (!name || !desc || !domain) { showMsg('Name, description, and domain are required.', false); return false; }
+
+  // Build structured text from the fields
+  let text = `${name}: ${desc}`;
+  if (relations) text += ` Key relationships: ${relations}`;
+
+  const btn = document.getElementById('btn-struct');
+  btn.disabled = true;
+  btn.textContent = 'Adding...';
+
+  try {
+    const res = await fetch(`${API}/api/concepts/text`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, source: `Structured entry: ${name}`, domain }),
+    });
+    const data = await res.json();
+    if (!res.ok) { showMsg(data.error || 'Failed to add concept', false); return false; }
+    showMsg(`Structured concept "${name}" added (${data.concept.id.slice(0,8)}...)`, true);
+    document.getElementById('struct-name').value = '';
+    document.getElementById('struct-desc').value = '';
+    document.getElementById('struct-relations').value = '';
+    await loadConcepts();
+    await loadStats();
+  } catch (err) {
+    showMsg('Request failed -- is the server running?', false);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Add Structured Concept';
   }
   return false;
 }
@@ -474,11 +1033,86 @@ async function submitUrl(e) {
     await loadConcepts();
     await loadStats();
   } catch (err) {
-    showMsg('Request failed — is the server running?', false);
+    showMsg('Request failed -- is the server running?', false);
   } finally {
     btn.disabled = false;
     btn.textContent = 'Fetch & Add Concepts';
   }
+  return false;
+}
+
+async function submitBulkUrls(e) {
+  e.preventDefault();
+  const fileInput = document.getElementById('bulk-url-file');
+  const domain = document.getElementById('bulk-url-domain').value.trim();
+  if (!fileInput.files.length || !domain) { showMsg('File and domain are required.', false); return false; }
+
+  // Read the file client-side and parse URLs
+  const text = await fileInput.files[0].text();
+  const urls = text.split('\n').map(l => l.trim()).filter(l => l.length > 0 && !l.startsWith('#'));
+  if (urls.length === 0) { showMsg('No URLs found in file.', false); return false; }
+
+  const btn = document.getElementById('btn-bulk-urls');
+  const progressDiv = document.getElementById('bulk-url-progress');
+  const resultsDiv = document.getElementById('bulk-url-results');
+  btn.disabled = true;
+  btn.textContent = 'Ingesting...';
+  progressDiv.style.display = 'block';
+  resultsDiv.style.display = 'none';
+  resultsDiv.innerHTML = '';
+
+  const results = [];
+  let totalConcepts = 0;
+  let failures = 0;
+
+  for (let i = 0; i < urls.length; i++) {
+    const url = urls[i];
+    const pct = Math.round(((i + 1) / urls.length) * 100);
+    document.getElementById('bulk-url-bar').style.width = pct + '%';
+    document.getElementById('bulk-url-status').textContent = `[${i + 1}/${urls.length}] Fetching ${url}`;
+
+    try {
+      const res = await fetch(`${API}/api/concepts/url`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url, domain }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        failures++;
+        results.push({ url, count: 0, error: data.error || 'Failed' });
+      } else {
+        totalConcepts += data.count;
+        results.push({ url, count: data.count });
+      }
+    } catch (err) {
+      failures++;
+      results.push({ url, count: 0, error: err.message || 'Network error' });
+    }
+
+    // Update results list in real time
+    let html = `<strong>Progress: ${i + 1}/${urls.length}</strong><br>`;
+    for (const r of results) {
+      if (r.error) {
+        html += `<div style="color:#dc3545;margin:2px 0">&#10007; ${r.url} — ${r.error}</div>`;
+      } else {
+        html += `<div style="color:#155724;margin:2px 0">&#10003; ${r.url} — ${r.count} concepts</div>`;
+      }
+    }
+    resultsDiv.innerHTML = html;
+    resultsDiv.style.display = 'block';
+  }
+
+  const successCount = urls.length - failures;
+  showMsg(`Done! ${totalConcepts} concepts from ${successCount} URLs (${failures} failed)`, true);
+  document.getElementById('bulk-url-status').textContent = 'Complete';
+
+  fileInput.value = '';
+  await loadConcepts();
+  await loadStats();
+
+  btn.disabled = false;
+  btn.textContent = 'Upload & Ingest All URLs';
   return false;
 }
 
@@ -510,12 +1144,152 @@ async function submitDocument(e) {
     await loadStats();
   } catch (err) {
     showMsg('Upload failed: ' + (err.message || err), false);
-    console.error('Document upload error:', err);
   } finally {
     btn.disabled = false;
     btn.textContent = 'Upload & Chunk';
   }
   return false;
+}
+
+// ── Chunk Staging ──
+
+let stagedChunksData = []; // array of { index, text, source, domain, estimatedTokens, selected }
+
+function renderStagedChunks() {
+  const list = document.getElementById('staged-chunks-list');
+  const selectedCount = stagedChunksData.filter(c => c.selected).length;
+  const total = stagedChunksData.length;
+  document.getElementById('staging-count').textContent = `${selectedCount} of ${total} chunks selected`;
+  document.getElementById('staging-select-all').checked = selectedCount === total;
+
+  list.innerHTML = stagedChunksData.map((chunk, i) => `
+    <div style="border:1px solid #eee;border-radius:6px;padding:10px;margin-bottom:6px;background:${chunk.selected ? '#fff' : '#f5f5f5'}">
+      <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer">
+        <input type="checkbox" ${chunk.selected ? 'checked' : ''} onchange="toggleStagedChunk(${i}, this.checked)" style="margin-top:3px">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:0.85rem;color:#222;white-space:pre-wrap;word-break:break-word;max-height:120px;overflow-y:auto">${escapeHtml(chunk.text)}</div>
+          <div style="font-size:0.75rem;color:#888;margin-top:4px">Chunk #${chunk.index + 1} &middot; ~${chunk.estimatedTokens} tokens &middot; ${escapeHtml(chunk.source)}</div>
+        </div>
+      </label>
+    </div>
+  `).join('');
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function toggleStagedChunk(index, checked) {
+  stagedChunksData[index].selected = checked;
+  renderStagedChunks();
+}
+
+function toggleAllStagedChunks(checked) {
+  stagedChunksData.forEach(c => c.selected = checked);
+  renderStagedChunks();
+}
+
+function showStagingArea(chunks) {
+  stagedChunksData = chunks.map(c => ({ ...c, selected: true }));
+  document.getElementById('staging-area').style.display = 'block';
+  renderStagedChunks();
+}
+
+function closeStagingArea() {
+  document.getElementById('staging-area').style.display = 'none';
+  stagedChunksData = [];
+}
+
+async function stageUrl() {
+  const url = document.getElementById('concept-url').value.trim();
+  const domain = document.getElementById('concept-url-domain').value.trim();
+  if (!url || !domain) { showMsg('URL and domain are required.', false); return; }
+
+  const btn = document.getElementById('btn-url-stage');
+  btn.disabled = true;
+  btn.textContent = 'Staging...';
+
+  try {
+    const res = await fetch(`${API}/api/concepts/url/stage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url, domain }),
+    });
+    const data = await res.json();
+    if (!res.ok) { showMsg(data.error || 'Failed to stage URL chunks', false); return; }
+    showMsg(`Staged ${data.totalChunks} chunk${data.totalChunks !== 1 ? 's' : ''} for review`, true);
+    showStagingArea(data.chunks);
+  } catch (err) {
+    showMsg('Request failed -- is the server running?', false);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Stage for Review';
+  }
+}
+
+async function stageDocument() {
+  const fileInput = document.getElementById('concept-file');
+  const domain = document.getElementById('concept-doc-domain').value.trim();
+  if (!fileInput.files.length || !domain) { showMsg('File and domain are required.', false); return; }
+
+  const file = fileInput.files[0];
+  const btn = document.getElementById('btn-doc-stage');
+  btn.disabled = true;
+  btn.textContent = 'Staging...';
+
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('domain', domain);
+
+    const res = await fetch(`${API}/api/concepts/document/stage`, {
+      method: 'POST',
+      body: formData,
+    });
+    const data = await res.json();
+    if (!res.ok) { showMsg(data.error || 'Failed to stage document chunks', false); return; }
+    showMsg(`Staged ${data.totalChunks} chunk${data.totalChunks !== 1 ? 's' : ''} from ${file.name} for review`, true);
+    showStagingArea(data.chunks);
+  } catch (err) {
+    showMsg('Upload failed: ' + (err.message || err), false);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Stage for Review';
+  }
+}
+
+async function approveSelectedChunks() {
+  const selected = stagedChunksData.filter(c => c.selected);
+  if (selected.length === 0) { showMsg('No chunks selected for approval.', false); return; }
+
+  const btn = document.getElementById('btn-approve-staged');
+  btn.disabled = true;
+  btn.textContent = 'Adding...';
+
+  try {
+    const domain = selected[0].domain;
+    const res = await fetch(`${API}/api/concepts/staged/approve`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chunks: selected.map(c => ({ text: c.text, source: c.source, domain: c.domain })),
+        domain,
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) { showMsg(data.error || 'Failed to approve chunks', false); return; }
+    showMsg(`Approved and added ${data.count} chunk${data.count !== 1 ? 's' : ''} to the knowledge base`, true);
+    closeStagingArea();
+    await loadConcepts();
+    await loadStats();
+  } catch (err) {
+    showMsg('Approval request failed: ' + (err.message || err), false);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Approve Selected Chunks';
+  }
 }
 
 async function removeConcept(id) {
@@ -526,13 +1300,83 @@ async function removeConcept(id) {
     showMsg('Concept deleted', true);
     await loadConcepts();
     await loadStats();
-  } catch (err) {
+  } catch {
     showMsg('Delete request failed', false);
   }
 }
 
+// ── Citation Import ──
+async function submitCitation(e) {
+  e.preventDefault();
+  const fileInput = document.getElementById('citation-file');
+  const pastedText = document.getElementById('citation-text').value.trim();
+  const domain = document.getElementById('citation-domain').value.trim();
+
+  if (!domain) { showMsg('Domain is required.', false); return false; }
+  if (!fileInput.files.length && !pastedText) { showMsg('Upload a file or paste citation data.', false); return false; }
+
+  const btn = document.getElementById('btn-citation');
+  btn.disabled = true;
+  btn.textContent = 'Importing...';
+
+  try {
+    let content = pastedText;
+    let filename = '';
+
+    if (fileInput.files.length) {
+      const file = fileInput.files[0];
+      filename = file.name;
+      content = await file.text();
+    }
+
+    // Detect format: BibTeX starts with @, RIS has lines like "TY  -"
+    const isBibtex = content.trim().startsWith('@') || /^@\w+\s*\{/m.test(content);
+    const isRIS = /^TY\s\s-/m.test(content);
+
+    let endpoint, body;
+    if (isBibtex) {
+      endpoint = `${API}/api/concepts/bibtex`;
+      body = JSON.stringify({ bibtex: content, domain });
+    } else if (isRIS) {
+      endpoint = `${API}/api/concepts/ris`;
+      body = JSON.stringify({ ris: content, domain });
+    } else if (filename.endsWith('.bib')) {
+      endpoint = `${API}/api/concepts/bibtex`;
+      body = JSON.stringify({ bibtex: content, domain });
+    } else if (filename.endsWith('.ris')) {
+      endpoint = `${API}/api/concepts/ris`;
+      body = JSON.stringify({ ris: content, domain });
+    } else {
+      showMsg('Could not detect format. Use a .bib or .ris file, or paste valid BibTeX/RIS content.', false);
+      btn.disabled = false;
+      btn.textContent = 'Import Citations';
+      return false;
+    }
+
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body,
+    });
+    const data = await res.json();
+    if (!res.ok) { showMsg(data.error || 'Import failed', false); return false; }
+    showMsg(`Imported ${data.count} concept${data.count !== 1 ? 's' : ''} from citations`, true);
+    fileInput.value = '';
+    document.getElementById('citation-text').value = '';
+    await loadConcepts();
+    await loadStats();
+  } catch (err) {
+    showMsg('Import failed: ' + (err.message || err), false);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Import Citations';
+  }
+  return false;
+}
+
 // ── Analytics ──
 async function loadAnalytics() {
+  // Load rejection analytics
   try {
     const res = await fetch(`${API}/api/analytics/rejections`);
     const data = await res.json();
@@ -540,23 +1384,30 @@ async function loadAnalytics() {
 
     let html = `<div class="scores" style="margin-bottom:16px">`;
     html += `<span class="score-badge score-good">Approval Rate: ${data.approvalRate}</span>`;
-    html += `<span class="score-badge score-ok">Total Decisions: ${data.totalDecisions}</span>`;
+    html += `<span class="score-badge score-info">Total Decisions: ${data.totalDecisions}</span>`;
     html += `<span class="score-badge score-bad">Total Rejections: ${data.totalRejections}</span>`;
     html += `</div>`;
 
+    // Recommendations
+    if (data.recommendations && data.recommendations.length > 0) {
+      html += `<div class="section" style="margin-bottom:16px"><div class="section-title">Recommendations</div>`;
+      for (const rec of data.recommendations) {
+        html += `<div class="rec-card">${escHtml(rec)}</div>`;
+      }
+      html += `</div>`;
+    }
+
+    // Rejection reasons bar chart
     const reasons = data.rejectionsByReason;
     const reasonKeys = Object.keys(reasons);
     if (reasonKeys.length > 0) {
-      html += `<div class="section"><div class="section-title">Rejection Reasons</div>`;
-      html += `<div style="margin-top:8px">`;
+      html += `<div class="section"><div class="section-title">Rejection Reasons</div><div style="margin-top:8px">`;
       for (const [reason, count] of Object.entries(reasons).sort((a,b) => b[1] - a[1])) {
         const pct = data.totalRejections > 0 ? ((count / data.totalRejections) * 100).toFixed(0) : 0;
-        html += `<div style="display:flex;align-items:center;margin-bottom:6px">`;
-        html += `<span style="width:180px;font-size:0.85rem">${reason.replace(/_/g,' ')}</span>`;
-        html += `<div style="flex:1;background:#eee;border-radius:3px;height:20px;margin:0 8px">`;
-        html += `<div style="width:${pct}%;background:#dc3545;height:100%;border-radius:3px;min-width:2px"></div>`;
-        html += `</div>`;
-        html += `<span style="font-size:0.85rem;font-weight:600;width:60px;text-align:right">${count} (${pct}%)</span>`;
+        html += `<div class="bar-row">`;
+        html += `<span class="bar-label">${reason.replace(/_/g, ' ')}</span>`;
+        html += `<div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:#dc3545"></div></div>`;
+        html += `<span class="bar-value">${count} (${pct}%)</span>`;
         html += `</div>`;
       }
       html += `</div></div>`;
@@ -568,6 +1419,306 @@ async function loadAnalytics() {
   } catch {
     document.getElementById('analytics-content').innerHTML = '<div class="empty">Could not load analytics.</div>';
   }
+
+  // Load threshold recommendations
+  try {
+    const res = await fetch(`${API}/api/analytics/threshold-recommendation`);
+    const data = await res.json();
+    const el = document.getElementById('threshold-recs');
+
+    let html = `<div class="scores" style="margin-bottom:12px">`;
+    html += `<span class="score-badge score-info">Current Acceptance Rate: ${data.acceptanceRate || 'N/A'}</span>`;
+    html += `<span class="score-badge score-info">Target: 5-15%</span>`;
+    html += `</div>`;
+
+    if (data.recommendation) {
+      html += `<div class="rec-card info">${escHtml(data.recommendation)}</div>`;
+    }
+    if (data.suggestedChanges) {
+      html += `<div style="margin-top:8px;font-size:0.85rem">`;
+      for (const [param, value] of Object.entries(data.suggestedChanges)) {
+        html += `<div class="config-row"><label>${param}</label><span style="font-weight:600">${value}</span></div>`;
+      }
+      html += `</div>`;
+    }
+    if (!data.recommendation && !data.suggestedChanges) {
+      html += `<div class="empty">Not enough data yet. Review more candidates to generate recommendations.</div>`;
+    }
+
+    el.innerHTML = html;
+  } catch {
+    document.getElementById('threshold-recs').innerHTML = '<div class="empty">Threshold recommendation endpoint not available.</div>';
+  }
+
+  // Load stage breakdown from logs
+  try {
+    const res = await fetch(`${API}/api/logs?limit=1000`);
+    const logs = await res.json();
+    const el = document.getElementById('stage-breakdown');
+
+    const stageCounts = {};
+    for (const log of logs) {
+      if (log.type === 'insight_discarded') {
+        const stage = log.failedStage || 'unknown';
+        stageCounts[stage] = (stageCounts[stage] || 0) + 1;
+      }
+    }
+
+    const puzzlesDiscarded = logs.filter(l => l.type === 'puzzle_discarded').length;
+    const insightsEvaluated = logs.filter(l => l.type === 'insight_evaluated').length;
+    const insightsPassed = logs.filter(l => l.type === 'insight_evaluated' && l.passed).length;
+
+    let html = `<div class="scores" style="margin-bottom:16px">`;
+    html += `<span class="score-badge score-bad">Puzzles Discarded: ${puzzlesDiscarded}</span>`;
+    html += `<span class="score-badge score-info">Insights Evaluated: ${insightsEvaluated}</span>`;
+    html += `<span class="score-badge score-good">Insights Passed: ${insightsPassed}</span>`;
+    html += `</div>`;
+
+    const stageKeys = Object.keys(stageCounts);
+    if (stageKeys.length > 0) {
+      const total = Object.values(stageCounts).reduce((a, b) => a + b, 0);
+      html += `<div class="section"><div class="section-title">Insights Discarded By Stage</div><div style="margin-top:8px">`;
+      for (const [stage, count] of Object.entries(stageCounts).sort((a,b) => b[1] - a[1])) {
+        const pct = total > 0 ? ((count / total) * 100).toFixed(0) : 0;
+        html += `<div class="bar-row">`;
+        html += `<span class="bar-label">${stage.replace(/_/g, ' ')}</span>`;
+        html += `<div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:#856404"></div></div>`;
+        html += `<span class="bar-value">${count} (${pct}%)</span>`;
+        html += `</div>`;
+      }
+      html += `</div></div>`;
+    } else {
+      html += `<div class="empty">No pipeline stage data yet. Run the pipeline to see breakdown.</div>`;
+    }
+
+    el.innerHTML = html;
+  } catch {
+    document.getElementById('stage-breakdown').innerHTML = '<div class="empty">Could not load stage breakdown.</div>';
+  }
+}
+
+// ── Config ──
+async function loadConfig() {
+  try {
+    const res = await fetch(`${API}/api/config`);
+    if (!res.ok) return;
+    const cfg = await res.json();
+    if (cfg.antiCorrelationWindow != null) document.getElementById('cfg-acw').value = cfg.antiCorrelationWindow;
+    if (cfg.defaultPairSize != null) document.getElementById('cfg-pairsize').value = cfg.defaultPairSize;
+    if (cfg.batchSize != null) document.getElementById('cfg-batchsize').value = cfg.batchSize;
+    if (cfg.stThresholdPercentile != null) document.getElementById('cfg-stpct').value = cfg.stThresholdPercentile;
+    if (cfg.stWindowSize != null) document.getElementById('cfg-stwin').value = cfg.stWindowSize;
+    if (cfg.fertilityThreshold != null) document.getElementById('cfg-fert').value = cfg.fertilityThreshold;
+    if (cfg.resilienceThreshold != null) document.getElementById('cfg-resil').value = cfg.resilienceThreshold;
+    if (cfg.compositeThreshold != null) document.getElementById('cfg-comp').value = cfg.compositeThreshold;
+    if (cfg.compositeWeights) {
+      if (cfg.compositeWeights.fertility != null) document.getElementById('cfg-wf').value = cfg.compositeWeights.fertility;
+      if (cfg.compositeWeights.resilience != null) document.getElementById('cfg-wr').value = cfg.compositeWeights.resilience;
+      if (cfg.compositeWeights.unification != null) document.getElementById('cfg-wu').value = cfg.compositeWeights.unification;
+    }
+  } catch { /* config endpoint may not exist yet */ }
+}
+
+async function saveConfig() {
+  const cfg = {
+    antiCorrelationWindow: parseFloat(document.getElementById('cfg-acw').value),
+    defaultPairSize: parseInt(document.getElementById('cfg-pairsize').value),
+    batchSize: parseInt(document.getElementById('cfg-batchsize').value),
+    stThresholdPercentile: parseFloat(document.getElementById('cfg-stpct').value),
+    stWindowSize: parseInt(document.getElementById('cfg-stwin').value),
+    fertilityThreshold: parseFloat(document.getElementById('cfg-fert').value),
+    resilienceThreshold: parseFloat(document.getElementById('cfg-resil').value),
+    compositeThreshold: parseFloat(document.getElementById('cfg-comp').value),
+    compositeWeights: {
+      fertility: parseFloat(document.getElementById('cfg-wf').value),
+      resilience: parseFloat(document.getElementById('cfg-wr').value),
+      unification: parseFloat(document.getElementById('cfg-wu').value),
+    },
+  };
+
+  // Validate weights sum
+  const wSum = cfg.compositeWeights.fertility + cfg.compositeWeights.resilience + cfg.compositeWeights.unification;
+  if (Math.abs(wSum - 1.0) > 0.01) {
+    document.getElementById('config-msg').innerHTML = `<span style="color:#dc3545">Weights must sum to 1.0 (currently ${wSum.toFixed(2)})</span>`;
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API}/api/config`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(cfg),
+    });
+    if (res.ok) {
+      document.getElementById('config-msg').innerHTML = '<span style="color:#155724">Configuration saved. Takes effect on next pipeline run.</span>';
+    } else {
+      const data = await res.json();
+      document.getElementById('config-msg').innerHTML = `<span style="color:#dc3545">${data.error || 'Save failed'}</span>`;
+    }
+  } catch {
+    document.getElementById('config-msg').innerHTML = '<span style="color:#dc3545">Could not save config. Config endpoint may not be available.</span>';
+  }
+  setTimeout(() => { document.getElementById('config-msg').innerHTML = ''; }, 4000);
+}
+
+// ── Schedule ──
+async function loadSchedule() {
+  try {
+    const res = await fetch(`${API}/api/schedule`);
+    const data = await res.json();
+    const el = document.getElementById('schedule-current');
+
+    if (data.active) {
+      el.className = 'schedule-status schedule-active';
+      el.innerHTML = `Schedule is <strong>ACTIVE</strong> -- running every <strong>${data.intervalMinutes} minutes</strong> with batch size <strong>${data.batchSize}</strong>. ` +
+        (data.lastRunAt ? `Last run: ${timeAgo(data.lastRunAt)}. ` : '') +
+        (data.nextRunAt ? `Next run: ${new Date(data.nextRunAt).toLocaleTimeString()}.` : '') +
+        ` Runs completed: ${data.runsCompleted || 0}`;
+    } else {
+      el.className = 'schedule-status';
+      el.textContent = 'No schedule is currently active. Set one below to automate pipeline runs.';
+    }
+  } catch {
+    document.getElementById('schedule-current').textContent = 'Schedule endpoint not available.';
+  }
+}
+
+async function setSchedule() {
+  const interval = parseInt(document.getElementById('sched-interval').value);
+  const batchSize = parseInt(document.getElementById('sched-batch').value);
+  if (!interval || interval < 5) { alert('Interval must be at least 5 minutes'); return; }
+  if (!batchSize || batchSize < 1) { alert('Batch size must be at least 1'); return; }
+
+  try {
+    const res = await fetch(`${API}/api/schedule`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ intervalMinutes: interval, batchSize }),
+    });
+    if (res.ok) {
+      await loadSchedule();
+    } else {
+      const data = await res.json();
+      alert(data.error || 'Failed to set schedule');
+    }
+  } catch (e) {
+    alert('Could not set schedule: ' + (e.message || e));
+  }
+}
+
+async function cancelSchedule() {
+  try {
+    const res = await fetch(`${API}/api/schedule`, { method: 'DELETE' });
+    await loadSchedule();
+  } catch (e) {
+    alert('Could not cancel schedule: ' + (e.message || e));
+  }
+}
+
+// ── Run History ──
+async function loadRunHistory() {
+  const el = document.getElementById('run-history-content');
+  try {
+    const res = await fetch(`${API}/api/pipeline/history`);
+    const history = await res.json();
+
+    if (!history || history.length === 0) {
+      el.innerHTML = '<div class="empty">No pipeline runs recorded yet.</div>';
+      return;
+    }
+
+    let html = '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:0.8rem">';
+    html += '<thead><tr style="border-bottom:2px solid #ddd;text-align:left">';
+    html += '<th style="padding:6px 8px">Start Time</th>';
+    html += '<th style="padding:6px 8px">Duration</th>';
+    html += '<th style="padding:6px 8px">Batch</th>';
+    html += '<th style="padding:6px 8px">Pairs</th>';
+    html += '<th style="padding:6px 8px">Puzzles</th>';
+    html += '<th style="padding:6px 8px">Insights</th>';
+    html += '<th style="padding:6px 8px">Candidates</th>';
+    html += '<th style="padding:6px 8px">Status</th>';
+    html += '</tr></thead><tbody>';
+
+    for (const run of history) {
+      const startTime = new Date(run.startedAt).toLocaleString();
+      const durationSec = (run.duration / 1000).toFixed(1);
+      const durationStr = run.duration >= 60000
+        ? Math.floor(run.duration / 60000) + 'm ' + ((run.duration % 60000) / 1000).toFixed(0) + 's'
+        : durationSec + 's';
+
+      const statusStyle = run.error
+        ? 'color:#dc3545;font-weight:600'
+        : 'color:#28a745;font-weight:600';
+      const statusText = run.error ? 'Error' : 'Success';
+
+      html += '<tr style="border-bottom:1px solid #eee">';
+      html += `<td style="padding:6px 8px">${startTime}</td>`;
+      html += `<td style="padding:6px 8px">${durationStr}</td>`;
+      html += `<td style="padding:6px 8px">${run.batchSize ?? '-'}</td>`;
+
+      if (run.result) {
+        html += `<td style="padding:6px 8px">${run.result.pairsProcessed ?? '-'}</td>`;
+        html += `<td style="padding:6px 8px">${run.result.puzzlesValidated ?? '-'}</td>`;
+        html += `<td style="padding:6px 8px">${run.result.insightsGenerated ?? '-'}</td>`;
+        html += `<td style="padding:6px 8px">${run.result.candidatesAdded ?? '-'}</td>`;
+      } else {
+        html += '<td style="padding:6px 8px">-</td>'.repeat(4);
+      }
+
+      html += `<td style="padding:6px 8px;${statusStyle}" title="${run.error ? escHtml(run.error) : ''}">${statusText}</td>`;
+      html += '</tr>';
+    }
+
+    html += '</tbody></table></div>';
+    el.innerHTML = html;
+  } catch {
+    el.innerHTML = '<div class="empty">Could not load run history.</div>';
+  }
+}
+
+// ── Logs ──
+async function loadLogs() {
+  try {
+    const res = await fetch(`${API}/api/logs?limit=500`);
+    const logs = await res.json();
+    const el = document.getElementById('logs-list');
+    const filter = document.getElementById('log-filter').value;
+
+    const filtered = filter ? logs.filter(l => l.type === filter) : logs;
+
+    if (filtered.length === 0) {
+      el.innerHTML = '<div class="empty">No log entries found.</div>';
+      return;
+    }
+
+    let html = '';
+    // Show newest first
+    for (const log of filtered.reverse()) {
+      const time = new Date(log.timestamp).toLocaleString();
+      const typeColor = {
+        puzzle_discarded: '#856404',
+        insight_discarded: '#dc3545',
+        insight_evaluated: '#0c5460',
+        review_decision: '#155724',
+        concept_added: '#1a1a2e',
+      }[log.type] || '#555';
+
+      // Build detail string
+      const details = Object.entries(log)
+        .filter(([k]) => !['timestamp', 'type'].includes(k))
+        .map(([k, v]) => `${k}: ${typeof v === 'object' ? JSON.stringify(v) : v}`)
+        .join(' | ');
+
+      html += `<div class="log-entry">`;
+      html += `<span class="log-time">${time}</span>`;
+      html += `<span class="log-type" style="color:${typeColor}">${log.type}</span>`;
+      html += `<span>${escHtml(details)}</span>`;
+      html += `</div>`;
+    }
+    el.innerHTML = html;
+  } catch {
+    document.getElementById('logs-list').innerHTML = '<div class="empty">Could not load logs.</div>';
+  }
 }
 
 // ── Tabs ──
@@ -576,22 +1727,27 @@ function switchTab(tab) {
   document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
   document.querySelector(`.tabs button[data-tab="${tab}"]`).classList.add('active');
 
-  const conceptsPanel = document.getElementById('concepts-panel');
-  const analyticsPanel = document.getElementById('analytics-panel');
-  const listPanel = document.getElementById('list');
-
-  conceptsPanel.style.display = 'none';
-  analyticsPanel.style.display = 'none';
-  listPanel.style.display = 'none';
+  // Hide all panels
+  document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
 
   if (tab === 'concepts') {
-    conceptsPanel.style.display = 'block';
+    document.getElementById('concepts-panel').style.display = 'block';
     loadConcepts();
   } else if (tab === 'analytics') {
-    analyticsPanel.style.display = 'block';
+    document.getElementById('analytics-panel').style.display = 'block';
     loadAnalytics();
+  } else if (tab === 'config') {
+    document.getElementById('config-panel').style.display = 'block';
+    loadConfig();
+  } else if (tab === 'schedule') {
+    document.getElementById('schedule-panel').style.display = 'block';
+    loadSchedule();
+    loadRunHistory();
+  } else if (tab === 'logs') {
+    document.getElementById('logs-panel').style.display = 'block';
+    loadLogs();
   } else {
-    listPanel.style.display = 'block';
+    document.getElementById('list').style.display = 'block';
     loadCandidates();
   }
 }
@@ -600,7 +1756,7 @@ document.querySelectorAll('.tabs button').forEach(btn => {
   btn.addEventListener('click', () => switchTab(btn.dataset.tab));
 });
 
-// Input sub-tabs (text / url)
+// Input sub-tabs
 document.querySelectorAll('.input-tabs button').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.input-tabs button').forEach(b => b.classList.remove('active'));
@@ -612,6 +1768,96 @@ document.querySelectorAll('.input-tabs button').forEach(btn => {
 
 // ── Pipeline ──
 let pipelinePolling = null;
+let pipelineSSE = null;
+
+function updateProgressBar(progress) {
+  const container = document.getElementById('pipeline-progress');
+  if (!progress || !progress.total) {
+    container.style.display = 'none';
+    return;
+  }
+  container.style.display = 'block';
+  const pct = Math.round((progress.current / progress.total) * 100);
+  document.getElementById('pipeline-progress-bar').style.width = pct + '%';
+  document.getElementById('pipeline-progress-text').textContent = progress.current + ' / ' + progress.total;
+  document.getElementById('pipeline-phase').textContent = progress.phase || '';
+}
+
+function resetPipelineBtn() {
+  const btn = document.getElementById('btn-run-pipeline');
+  btn.disabled = false;
+  btn.textContent = 'Run Pipeline';
+  btn.style.opacity = '1';
+  btn.style.cursor = 'pointer';
+}
+
+function onPipelineComplete(result) {
+  const indicator = document.getElementById('pipeline-indicator');
+  const msg = document.getElementById('pipeline-msg');
+  const resultEl = document.getElementById('pipeline-result');
+  document.getElementById('pipeline-progress').style.display = 'none';
+  indicator.textContent = 'Complete';
+  indicator.style.color = '#28a745';
+  resultEl.style.display = 'block';
+  resultEl.innerHTML =
+    `<span class="score-badge score-good">Pairs: ${result.pairsProcessed}</span> ` +
+    `<span class="score-badge score-ok">Validated Puzzles: ${result.puzzlesValidated}</span> ` +
+    `<span class="score-badge score-ok">Insights: ${result.insightsGenerated}</span> ` +
+    `<span class="score-badge score-good">Candidates Added: ${result.candidatesAdded}</span>`;
+  resetPipelineBtn();
+  loadStats();
+  if (!['concepts', 'analytics', 'config', 'schedule', 'logs'].includes(currentTab)) {
+    loadCandidates();
+  }
+}
+
+function onPipelineError(error) {
+  const indicator = document.getElementById('pipeline-indicator');
+  const msg = document.getElementById('pipeline-msg');
+  document.getElementById('pipeline-progress').style.display = 'none';
+  indicator.textContent = 'Failed';
+  indicator.style.color = '#dc3545';
+  msg.textContent = error;
+  resetPipelineBtn();
+  loadStats();
+}
+
+function connectSSE() {
+  if (pipelineSSE) { pipelineSSE.close(); pipelineSSE = null; }
+  try {
+    const es = new EventSource(`${API}/api/pipeline/stream`);
+    pipelineSSE = es;
+    es.onmessage = function(event) {
+      try {
+        const data = JSON.parse(event.data);
+        console.log('[SSE]', data.type, data.progress);
+        const msg = document.getElementById('pipeline-msg');
+        if (data.type === 'status') {
+          msg.textContent = data.message;
+          updateProgressBar(data.progress);
+        } else if (data.type === 'complete') {
+          es.close();
+          pipelineSSE = null;
+          onPipelineComplete(data.result);
+        } else if (data.type === 'error') {
+          es.close();
+          pipelineSSE = null;
+          onPipelineError(data.error);
+        }
+      } catch (e) { console.error('[SSE parse error]', e); }
+    };
+    es.onerror = function(e) {
+      // SSE failed, fall back to polling
+      es.close();
+      pipelineSSE = null;
+      console.log('SSE connection failed, falling back to polling', e);
+      pipelinePolling = setInterval(pollPipelineStatus, 1500);
+    };
+  } catch {
+    // EventSource not supported, fall back to polling
+    pipelinePolling = setInterval(pollPipelineStatus, 1500);
+  }
+}
 
 async function startPipeline() {
   const btn = document.getElementById('btn-run-pipeline');
@@ -630,21 +1876,14 @@ async function startPipeline() {
     const data = await res.json();
     if (!res.ok) {
       alert(data.error || 'Failed to start pipeline');
-      btn.disabled = false;
-      btn.textContent = 'Run Pipeline';
-      btn.style.opacity = '1';
-      btn.style.cursor = 'pointer';
+      resetPipelineBtn();
       return;
     }
-    // Start polling for status
     showPipelineStatus();
-    pipelinePolling = setInterval(pollPipelineStatus, 1500);
+    connectSSE();
   } catch (err) {
     alert('Could not start pipeline: ' + (err.message || err));
-    btn.disabled = false;
-    btn.textContent = 'Run Pipeline';
-    btn.style.opacity = '1';
-    btn.style.cursor = 'pointer';
+    resetPipelineBtn();
   }
 }
 
@@ -661,52 +1900,28 @@ async function pollPipelineStatus() {
   try {
     const res = await fetch(`${API}/api/pipeline/status`);
     const s = await res.json();
-    const indicator = document.getElementById('pipeline-indicator');
     const msg = document.getElementById('pipeline-msg');
-    const resultEl = document.getElementById('pipeline-result');
 
-    // Show latest message
     if (s.messages.length > 0) {
       msg.textContent = s.messages[s.messages.length - 1];
     }
+    updateProgressBar(s.progress);
 
     if (!s.running) {
       clearInterval(pipelinePolling);
       pipelinePolling = null;
 
-      const btn = document.getElementById('btn-run-pipeline');
-      btn.disabled = false;
-      btn.textContent = 'Run Pipeline';
-      btn.style.opacity = '1';
-      btn.style.cursor = 'pointer';
-
       if (s.error) {
-        indicator.textContent = 'Failed';
-        indicator.style.color = '#dc3545';
-        msg.textContent = s.error;
+        onPipelineError(s.error);
       } else if (s.result) {
-        indicator.textContent = 'Complete';
-        indicator.style.color = '#28a745';
-        resultEl.style.display = 'block';
-        resultEl.innerHTML =
-          `<span class="score-badge score-good">Pairs: ${s.result.pairsProcessed}</span> ` +
-          `<span class="score-badge score-ok">Validated Puzzles: ${s.result.puzzlesValidated}</span> ` +
-          `<span class="score-badge score-ok">Insights: ${s.result.insightsGenerated}</span> ` +
-          `<span class="score-badge score-good">Candidates Added: ${s.result.candidatesAdded}</span>`;
-      }
-
-      // Refresh data
-      await loadStats();
-      if (currentTab !== 'concepts' && currentTab !== 'analytics') {
-        await loadCandidates();
+        onPipelineComplete(s.result);
+      } else {
+        resetPipelineBtn();
       }
     }
-  } catch {
-    // Ignore polling errors
-  }
+  } catch { /* ignore polling errors */ }
 }
 
-// Check if pipeline is already running on page load
 async function checkPipelineOnLoad() {
   try {
     const res = await fetch(`${API}/api/pipeline/status`);
@@ -718,7 +1933,7 @@ async function checkPipelineOnLoad() {
       btn.style.opacity = '0.6';
       btn.style.cursor = 'not-allowed';
       showPipelineStatus();
-      pipelinePolling = setInterval(pollPipelineStatus, 1500);
+      connectSSE();
     }
   } catch { /* ignore */ }
 }
